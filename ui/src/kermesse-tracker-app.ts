@@ -8,8 +8,8 @@ import {CSS_Global} from "./styles/ConstructibleStyleSheets";
  * @slot - This element has a slot
  * @csspart button - The button
  */
-@customElement('my-element')
-export class MyElement extends LitElement {
+@customElement('kermesse-tracker-app')
+export class KermesseTrackerApp extends LitElement {
   //language=css
   static styles = [
       CSS_Global,
@@ -55,6 +55,6 @@ export class MyElement extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'my-element': MyElement
+    'kermesse-tracker-app': KermesseTrackerApp
   }
 }
