@@ -1,5 +1,6 @@
 import { html, css, LitElement } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
+import {CSS_Global} from "./styles/ConstructibleStyleSheets";
 
 /**
  * An example element.
@@ -9,14 +10,17 @@ import { customElement, property } from 'lit/decorators.js'
  */
 @customElement('my-element')
 export class MyElement extends LitElement {
-  static styles = css`
+  //language=css
+  static styles = [
+      CSS_Global,
+      css`
     :host {
       display: block;
       border: solid 1px gray;
       padding: 16px;
       max-width: 800px;
     }
-  `
+  `]
 
   /**
    * The name to say "Hello" to.
