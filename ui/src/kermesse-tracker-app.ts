@@ -16,40 +16,31 @@ export class KermesseTrackerApp extends LitElement {
       css`
     :host {
       display: block;
-      border: solid 1px gray;
       padding: 16px;
-      max-width: 800px;
     }
   `]
 
-  /**
-   * The name to say "Hello" to.
-   */
   @property()
-  name = 'World'
+  families: Family[] = []
 
-  /**
-   * The number of times the button has been clicked.
-   */
-  @property({ type: Number })
-  count = 0
+  @property()
+  checkins: Checkin[] = []
+
+  constructor() {
+    super();
+
+    fetch('https://gist.githubusercontent.com/fcamblor/277f0d79f6ae94f3ebcc7c183973c21f/raw/kermesse-2022.json')
+        .then(resp => resp.json())
+        .then(payload => {
+          this.families = payload.families;
+        })
+  }
 
   render() {
     return html`
-      <h1>Hello, ${this.name}!</h1>
-      <button @click=${this._onClick} part="button">
-        Click Count: ${this.count}
-      </button>
-      <slot></slot>
+      <stats-heading .checkins="${this.checkins}"></stats-heading>
+      Total families: ${this.families.length}
     `
-  }
-
-  private _onClick() {
-    this.count++
-  }
-
-  foo(): string {
-    return 'foo'
   }
 }
 
