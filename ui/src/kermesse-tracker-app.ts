@@ -1,6 +1,7 @@
-import { html, css, LitElement } from 'lit'
-import { customElement, property } from 'lit/decorators.js'
+import {html, css, LitElement} from 'lit'
+import { customElement, state } from 'lit/decorators.js'
 import {CSS_Global} from "./styles/ConstructibleStyleSheets";
+import {MemberSelected} from "./components/people-selector";
 
 /**
  * An example element.
@@ -16,14 +17,14 @@ export class KermesseTrackerApp extends LitElement {
       css`
     :host {
       display: block;
-      padding: 16px;
+      padding: 0px;
     }
   `]
 
-  @property()
+  @state()
   families: Family[] = []
 
-  @property()
+  @state()
   checkins: Checkin[] = []
 
   constructor() {
@@ -39,8 +40,17 @@ export class KermesseTrackerApp extends LitElement {
   render() {
     return html`
       <stats-heading .checkins="${this.checkins}"></stats-heading>
+      <hr class="m-2">
+      <people-selector 
+          .members="${this.families.flatMap(f => f.members.concat(f.schoolChildren))}"
+          @on-member-selected="${(e: CustomEvent<MemberSelected>) => this.showFamilyCheckin(e.detail.member)}"
+      ></people-selector>
       Total families: ${this.families.length}
     `
+  }
+
+  private showFamilyCheckin(member: Member) {
+    console.log(`Selected member: ${JSON.stringify(member)}`);
   }
 }
 

@@ -16,11 +16,12 @@ export class StatsHeading extends LitElement {
       css`
     :host {
       display: block;
+      padding: 4px 16px;
       width: 100%;
     }
   `]
 
-  @property()
+  @property({type: Array})
   checkins: Checkin[] = []
 
   render() {

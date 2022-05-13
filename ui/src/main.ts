@@ -2,3 +2,4 @@
 
 import "./kermesse-tracker-app"
 import "./components/stats-heading"
+import "./components/people-selector"
