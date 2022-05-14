@@ -3,6 +3,7 @@ import {customElement, property, state} from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 import {repeat} from "lit/directives/repeat.js";
 import {memberKey} from "../services/Members";
+import {toFullTextNormalized} from "../services/Text";
 
 type CheckinMember = {
     idx: number;
@@ -128,7 +129,7 @@ export class CheckinFromExistingFamily extends LitElement {
 
   firstNameUpdatedFor(checkinMember: CheckinMember) {
       return (e: InputEvent) => {
-          checkinMember.firstName = (e.target as HTMLInputElement).value.toUpperCase();
+          checkinMember.firstName = (e.target as HTMLInputElement).value;
           this.updateValidForm();
       }
   }
@@ -191,9 +192,14 @@ export class CheckinFromExistingFamily extends LitElement {
   }
 
   updateValidForm(): void {
-      this.validForm = this.checkinMembers.reduce((isValid, cm) => {
+      const allRowsAreFilled = this.checkinMembers.reduce((isValid, cm) => {
           return isValid && (cm.firstName+cm.lastName)!=='';
       }, true as boolean);
+
+      const names = this.checkinMembers.map(cm => `${toFullTextNormalized(cm.lastName).toLowerCase()}__${toFullTextNormalized(cm.firstName).toLowerCase()}`);
+      const allNamesAreUnique = new Set(names).size === names.length;
+
+      this.validForm = allRowsAreFilled && allNamesAreUnique;
   }
 
   cancelCheckin(): void {
