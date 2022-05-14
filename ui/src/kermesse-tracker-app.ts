@@ -22,6 +22,9 @@ export class KermesseTrackerApp extends LitElement {
   @state()
   checkins: Checkin[] = []
 
+  @state()
+  existingFamily: Family|undefined = undefined;
+
   constructor() {
     super();
 
@@ -38,18 +41,35 @@ export class KermesseTrackerApp extends LitElement {
 
   render() {
     return html`
-      <stats-heading .checkins="${this.checkins}"></stats-heading>
-      <hr class="m-2">
-      <people-selector 
-          .members="${this.families.flatMap(f => f.members.concat(f.schoolChildren))}"
-          @on-member-selected="${(e: CustomEvent<MemberSelected>) => this.showFamilyCheckin(e.detail.member)}"
-      ></people-selector>
-      Total families: ${this.families.length}
+      ${this.existingFamily?html`
+        <checkin-from-existing-family 
+            .family="${this.existingFamily}"
+            @on-checkin-performed="${(e: CustomEvent<Checkin>) => this.onCheckinPerformed(e.detail)}"
+            @on-checkin-cancelled="${() => this.onCheckinCancelled()}"
+        ></checkin-from-existing-family>
+      `:html`
+        <stats-heading .checkins="${this.checkins}"></stats-heading>
+        <hr class="m-2">
+        <people-selector
+            .members="${this.families.flatMap(familyMembers)}"
+            @on-member-selected="${(e: CustomEvent<MemberSelected>) => this.showFamilyCheckin(e.detail.member)}"
+        ></people-selector>
+      `}
     `
   }
 
   private showFamilyCheckin(member: Member) {
-    console.log(`Selected member: ${JSON.stringify(member)}`);
+    this.existingFamily = findFamilyContaining(this.families, member);
+  }
+
+  private onCheckinPerformed(checkin: Checkin) {
+    console.log(`Checkin performed : ${JSON.stringify(checkin)}`)
+    this.checkins.push(checkin);
+    this.existingFamily = undefined;
+  }
+
+  private onCheckinCancelled() {
+    this.existingFamily = undefined;
   }
 }
 
