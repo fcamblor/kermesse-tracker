@@ -3,6 +3,7 @@ import { customElement, state } from 'lit/decorators.js'
 import {CSS_Global} from "./styles/ConstructibleStyleSheets";
 import {MemberSelected} from "./components/people-selector";
 import {familyMembers, findFamilyContaining} from "./services/Families";
+import {PersistedCheckins} from "./persistance/PersistedCheckins";
 
 @customElement('kermesse-tracker-app')
 export class KermesseTrackerApp extends LitElement {
@@ -36,7 +37,12 @@ export class KermesseTrackerApp extends LitElement {
             schoolChildren: f.schoolChildren.map((sc: Omit<SchoolChild, "isSchoolChild">) => ({...sc, isSchoolChild: true})),
             members: f.members.map((m: Omit<Member, "isSchoolChild">) => ({...m, isSchoolChild: false})),
           }));
-        })
+        });
+
+    PersistedCheckins.load()
+        .then((checkins) => {
+          this.checkins = checkins
+        });
   }
 
   render() {
@@ -66,6 +72,8 @@ export class KermesseTrackerApp extends LitElement {
     console.log(`Checkin performed : ${JSON.stringify(checkin)}`)
     this.checkins.push(checkin);
     this.existingFamily = undefined;
+
+    PersistedCheckins.store(this.checkins);
   }
 
   private onCheckinCancelled() {
