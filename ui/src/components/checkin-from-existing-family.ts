@@ -3,6 +3,8 @@ import {customElement, property, state} from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 import {repeat} from "lit/directives/repeat.js";
 import {memberKey} from "../services/Members";
+import {findFamilyMembersNeverCheckedIn, pastCheckinMembers} from "../services/Checkins";
+import {formatTime} from "../services/DateAndTimes";
 import {toFullTextNormalized} from "../services/Text";
 
 type CheckinMember = {
@@ -25,21 +27,34 @@ export class CheckinFromExistingFamily extends LitElement {
     }
   `]
 
-  @property({type: Array})
-  set family(family: Family) {
-    this._family = family;
-    this.adultsCount = this.family.plannedCounts.adults;
-    this.nonSchoolChildrenCount = this.family.plannedCounts.nonSchoolChildren;
+  @property({type: Object})
+  set familyWithCheckins(familyWithCheckins: FamilyWithCheckins) {
+    this._family = familyWithCheckins.family;
+    this._pastCheckins = familyWithCheckins.pastCheckins;
+
+    if(familyWithCheckins.pastCheckins.length) {
+        const familyMembersNeverCheckedIn = findFamilyMembersNeverCheckedIn(this._family, familyWithCheckins.pastCheckins);
+        this.adultsCount = familyMembersNeverCheckedIn.length;
+        this.nonSchoolChildrenCount = 0
+        this.pastCheckinMembers = pastCheckinMembers(familyWithCheckins.pastCheckins);
+        this.nonCheckedInMembers = familyMembersNeverCheckedIn;
+    } else {
+        this.adultsCount = this._family.plannedCounts.adults;
+        this.nonSchoolChildrenCount = this._family.plannedCounts.nonSchoolChildren;
+        this.pastCheckinMembers = [];
+        this.nonCheckedInMembers = this._family.members;
+    }
+
     this.updateCheckinMembers(false);
   }
-  get family(): Family {
-    return this._family;
-  }
   _family!: Family;
+  _pastCheckins!: Checkin[];
 
   @state() adultsCount!: number;
   @state() nonSchoolChildrenCount!: number;
-  @state() checkinMembers!: CheckinMember[];
+  @state() nonCheckedInMembers!: Member[];
+  @state() pastCheckinMembers!: Member[];
+  @state() checkinMembers: CheckinMember[] = [];
   get plannedCheckinMembers(): CheckinMember[] { return this.checkinMembers.filter(cm => cm.isPlanned); }
   get plannedPresentCheckinMembers(): CheckinMember[] { return this.checkinMembers.filter(cm => cm.isPlanned && cm.present); }
   @state() validForm: boolean = false;
@@ -48,7 +63,7 @@ export class CheckinFromExistingFamily extends LitElement {
     return html`
       <h4>Enfants scolarisés</h4>
       <ul>
-        ${repeat(this.family.schoolChildren, memberKey, (schoolChild: SchoolChild) => html`
+        ${repeat(this._family.schoolChildren, memberKey, (schoolChild: SchoolChild) => html`
           <li><strong>${schoolChild.lastName.toUpperCase()} ${schoolChild.firstName}</strong> (${schoolChild.className})</li>
         `)}
       </ul>
@@ -117,6 +132,32 @@ export class CheckinFromExistingFamily extends LitElement {
         <button type="button" class="btn btn-lg btn-primary" @click=${() => this.submitCheckin()} .disabled="${!this.validForm}">Valider</button>
         <button type="button" class="btn btn-lg btn-warning" @click="${() => this.cancelCheckin()}">Retour</button>
       </div>
+      
+      ${this._pastCheckins.length?html`
+      <hr class="m-2"/>
+      <h4>Checkins précédents</h4>
+        <ul>
+          ${repeat(this._pastCheckins, pc => `${pc.isoDate}_${pc.familyLastName}`, pc => html`
+          <li>@${formatTime(pc.isoDate)} - ${pc.counts.adults} Adu + ${pc.counts.nonSchoolChildren} Enf</li>
+          `)}
+        </ul>
+        <table class="table table-sm">
+          <thead>
+          <tr>
+            <th scope="col" class="col-12">Nom</th>
+            <th scope="col" class="col-12">Prénom</th>
+          </tr>
+          </thead>
+          <tbody>
+        ${repeat(this.pastCheckinMembers, memberKey, m => html`
+            <tr>
+              <td>&nbsp;${m.lastName.toUpperCase()}</td>
+              <td>&nbsp;${m.firstName}</td>
+            </tr>
+        `)}
+          </tbody>
+        </table>
+      `:html``}
     `
   }
 
@@ -168,7 +209,7 @@ export class CheckinFromExistingFamily extends LitElement {
   updateCheckinMembers(keepExistingPlannedMembers: boolean = true): void {
       const plannedMembers: CheckinMember[] = keepExistingPlannedMembers?
           this.plannedCheckinMembers
-          :this.family.members.map<CheckinMember>((m, idx) => ({
+          :this.nonCheckedInMembers.map<CheckinMember>((m, idx) => ({
               idx,
               lastName: m.lastName.toUpperCase(),
               firstName: m.firstName,
@@ -176,17 +217,34 @@ export class CheckinFromExistingFamily extends LitElement {
               present: true
           }));
 
-      const plannedPresentMembers = plannedMembers.filter(cm => cm.present);
+      const plannedAbsentMembers = plannedMembers.filter(cm => !cm.present);
 
-      this.checkinMembers = plannedMembers.concat(...new Array(
-          Math.max(this.adultsCount + this.nonSchoolChildrenCount - plannedPresentMembers.length, 0)
-      ).fill(0).map<CheckinMember>((_, idx) => ({
-          idx: idx + plannedMembers.length,
-          lastName: "",
-          firstName: "",
-          isPlanned: false,
-          present: true
-      })))
+      let updateRequested = false;
+      if(!this.checkinMembers.length) {
+          this.checkinMembers = plannedMembers;
+          updateRequested = true;
+      }
+
+      const itemsCountToAdd = this.adultsCount + this.nonSchoolChildrenCount - this.checkinMembers.length + plannedAbsentMembers.length;
+      if(itemsCountToAdd < 0) {
+          this.checkinMembers.splice(this.checkinMembers.length + itemsCountToAdd, -itemsCountToAdd);
+          updateRequested = true;
+      } else if(itemsCountToAdd > 0) {
+          new Array(itemsCountToAdd).fill(0).forEach(() => {
+              this.checkinMembers.push({
+                  idx: this.checkinMembers.length,
+                  lastName: "",
+                  firstName: "",
+                  isPlanned: false,
+                  present: true
+              })
+          })
+          updateRequested = true;
+      }
+
+      if(updateRequested) {
+          this.requestUpdate('checkinMembers');
+      }
 
       this.updateValidForm();
   }
@@ -210,9 +268,8 @@ export class CheckinFromExistingFamily extends LitElement {
   submitCheckin(): void {
       const checkin: Checkin = {
           isoDate: new Date().toISOString(),
-          familyLastName: this.family.schoolChildren[0].lastName,
+          familyLastName: this._family.schoolChildren[0].lastName,
           members: ([] as Member[])
-              .concat(...this.family.schoolChildren)
               .concat(...this.checkinMembers.filter(cm => cm.present).map(cm => ({
                   firstName: cm.firstName,
                   lastName: cm.lastName,
@@ -221,7 +278,7 @@ export class CheckinFromExistingFamily extends LitElement {
           counts: {
               adults: this.adultsCount,
               nonSchoolChildren: this.nonSchoolChildrenCount,
-              schoolChildren: this.family.schoolChildren.length
+              schoolChildren: this._family.schoolChildren.length
           }
       };
       this.dispatchEvent(new CustomEvent<Checkin>('on-checkin-performed', {

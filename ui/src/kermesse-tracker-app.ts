@@ -4,6 +4,7 @@ import {CSS_Global} from "./styles/ConstructibleStyleSheets";
 import {MemberSelected} from "./components/people-selector";
 import {familyMembers, findFamilyContaining} from "./services/Families";
 import {PersistedCheckins} from "./persistance/PersistedCheckins";
+import {findPastCheckinsMatchingFamily} from "./services/Checkins";
 
 @customElement('kermesse-tracker-app')
 export class KermesseTrackerApp extends LitElement {
@@ -24,7 +25,7 @@ export class KermesseTrackerApp extends LitElement {
   checkins: Checkin[] = []
 
   @state()
-  existingFamily: Family|undefined = undefined;
+  existingFamilyWithCheckins: FamilyWithCheckins|undefined = undefined;
 
   constructor() {
     super();
@@ -47,9 +48,9 @@ export class KermesseTrackerApp extends LitElement {
 
   render() {
     return html`
-      ${this.existingFamily?html`
+      ${this.existingFamilyWithCheckins?html`
         <checkin-from-existing-family 
-            .family="${this.existingFamily}"
+            .familyWithCheckins="${this.existingFamilyWithCheckins}"
             @on-checkin-performed="${(e: CustomEvent<Checkin>) => this.onCheckinPerformed(e.detail)}"
             @on-checkin-cancelled="${() => this.onCheckinCancelled()}"
         ></checkin-from-existing-family>
@@ -65,19 +66,25 @@ export class KermesseTrackerApp extends LitElement {
   }
 
   private showFamilyCheckin(member: Member) {
-    this.existingFamily = findFamilyContaining(this.families, member);
+    const matchingFamily = findFamilyContaining(this.families, member);
+    const matchingPastCheckins = findPastCheckinsMatchingFamily(this.checkins, matchingFamily);
+
+    this.existingFamilyWithCheckins = {
+      family: matchingFamily,
+      pastCheckins: matchingPastCheckins
+    };
   }
 
   private onCheckinPerformed(checkin: Checkin) {
     console.log(`Checkin performed : ${JSON.stringify(checkin)}`)
     this.checkins.push(checkin);
-    this.existingFamily = undefined;
+    this.existingFamilyWithCheckins = undefined;
 
     PersistedCheckins.store(this.checkins);
   }
 
   private onCheckinCancelled() {
-    this.existingFamily = undefined;
+    this.existingFamilyWithCheckins = undefined;
   }
 }
 

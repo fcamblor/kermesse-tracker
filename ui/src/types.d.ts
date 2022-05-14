@@ -31,3 +31,8 @@ declare type Checkin = {
         nonSchoolChildren: number;
     }
 }
+
+declare type FamilyWithCheckins = {
+    family: Family;
+    pastCheckins: Checkin[];
+}
