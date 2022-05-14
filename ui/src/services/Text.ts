@@ -15,3 +15,11 @@ export function toFullTextNormalized(value: string) {
         .replace(/[úùûüûù]/gi, "u")
         .replace(/[œ]/gi, "oe");
 }
+
+export function numberInputValue(eventTarget: EventTarget|null, fallbackValue: number): number {
+    if(!eventTarget) {
+        return fallbackValue;
+    }
+    const inputEl = eventTarget as HTMLInputElement;
+    return isNaN(inputEl.valueAsNumber)?fallbackValue:inputEl.valueAsNumber;
+}

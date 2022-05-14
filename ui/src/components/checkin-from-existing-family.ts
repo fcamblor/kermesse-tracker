@@ -2,7 +2,9 @@ import {html, css, LitElement} from 'lit'
 import {customElement, property, state} from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 import {repeat} from "lit/directives/repeat.js";
+import {live} from 'lit/directives/live.js';
 import {memberKey} from "../services/Members";
+import {numberInputValue} from "../services/Text";
 
 type CheckinMember = {
     idx: number;
@@ -58,7 +60,7 @@ export class CheckinFromExistingFamily extends LitElement {
           <label class="visually-hidden" for="adultsCount">Adults count</label>
           <div class="input-group">
             <div class="input-group-text">Adultes :</div>
-            <input id="adultsCount" type="number" .value="${this.adultsCount}" 
+            <input id="adultsCount" type="number" min="0" .value="${live(this.adultsCount)}" 
                    @change="${(e:InputEvent) => this.updateAdultsCount(e)}" style="width: 55px">
           </div>
         </div>
@@ -66,7 +68,7 @@ export class CheckinFromExistingFamily extends LitElement {
           <label class="visually-hidden" for="childrenCount">Children count</label>
           <div class="input-group">
             <div class="input-group-text">Enfants :</div>
-            <input id="childrenCount" type="number" .value="${this.nonSchoolChildrenCount}" 
+            <input id="childrenCount" type="number" min="0" .value="${live(this.nonSchoolChildrenCount)}" 
                    @change="${(e:InputEvent) => this.updateNonSchoolChildrenCount(e)}" style="width: 55px">
           </div>
         </div>
@@ -147,7 +149,7 @@ export class CheckinFromExistingFamily extends LitElement {
   }
 
   updateNonSchoolChildrenCount(e: Event) {
-      this.nonSchoolChildrenCount = (e.currentTarget as HTMLInputElement).valueAsNumber;
+      this.nonSchoolChildrenCount = numberInputValue(e.currentTarget, 0);
       if(this.nonSchoolChildrenCount + this.adultsCount < this.plannedPresentCheckinMembers.length) {
           this.adultsCount = this.plannedPresentCheckinMembers.length - this.nonSchoolChildrenCount;
       }
@@ -155,7 +157,7 @@ export class CheckinFromExistingFamily extends LitElement {
   }
 
   updateAdultsCount(e: Event) {
-      this.adultsCount = (e.currentTarget as HTMLInputElement).valueAsNumber;
+      this.adultsCount = numberInputValue(e.currentTarget, 0);
       if(this.nonSchoolChildrenCount + this.adultsCount < this.plannedPresentCheckinMembers.length) {
           this.nonSchoolChildrenCount = this.plannedPresentCheckinMembers.length - this.adultsCount;
       }
