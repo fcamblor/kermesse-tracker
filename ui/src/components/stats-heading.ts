@@ -2,12 +2,6 @@ import { html, css, LitElement } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 
-/**
- * An example element.
- *
- * @slot - This element has a slot
- * @csspart button - The button
- */
 @customElement('stats-heading')
 export class StatsHeading extends LitElement {
   //language=css

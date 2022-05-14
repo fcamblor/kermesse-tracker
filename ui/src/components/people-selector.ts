@@ -4,19 +4,13 @@ import {classMap} from 'lit/directives/class-map.js';
 import {customElement, property, query, state} from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 import peopleSelectorCss from "./people-selector.scss";
+import { toFullTextNormalized } from '../services/Text';
+import {memberKey} from "../services/Members";
 
 const SVG_CLOSE_ICON = html`<svg width="25" height="25" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" fill="black"><path d="M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11zm0 10.293l5.293-5.293.707.707-5.293 5.293 5.293 5.293-.707.707-5.293-5.293-5.293 5.293-.707-.707 5.293-5.293-5.293-5.293.707-.707 5.293 5.293z"/></svg>`
 
 export type MemberSelected = { member: Member };
 
-const memberKey = (member: Member) => `${member.lastName.toUpperCase()} ${member.firstName}`;
-
-/**
- * An example element.
- *
- * @slot - This element has a slot
- * @csspart button - The button
- */
 @customElement('people-selector')
 export class PeopleSelector extends LitElement {
   //language=css
@@ -144,24 +138,7 @@ export class PeopleSelector extends LitElement {
     }
 
     private static normalize(term: string): string {
-        return PeopleSelector.toFullTextNormalized(term);
-    }
-
-    public static toFullTextNormalized(value: string) {
-        // /!\ important note : this method is shared between the communes-import.ts tooling file
-        // and Autocomplete.ts. The Commune lists are hence pre-computed and then fetched using
-        // normalized prefixes that were created using this method.
-        // Hence its extraction into a reusable/shareable mjs file
-        return value.toLowerCase().trim()
-            .replace(/[-\s']/gi, "_")
-            .replace(/[èéëêêéè]/gi, "e")
-            .replace(/[áàâäãåâà]/gi, "a")
-            .replace(/[çç]/gi, "c")
-            .replace(/[íìîï]/gi, "i")
-            .replace(/[ñ]/gi, "n")
-            .replace(/[óòôöõô]/gi, "o")
-            .replace(/[úùûüûù]/gi, "u")
-            .replace(/[œ]/gi, "oe");
+        return toFullTextNormalized(term);
     }
 
     private memberSelected(member: Member) {

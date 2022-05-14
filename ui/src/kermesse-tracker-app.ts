@@ -2,13 +2,8 @@ import {html, css, LitElement} from 'lit'
 import { customElement, state } from 'lit/decorators.js'
 import {CSS_Global} from "./styles/ConstructibleStyleSheets";
 import {MemberSelected} from "./components/people-selector";
+import {familyMembers, findFamilyContaining} from "./services/Families";
 
-/**
- * An example element.
- *
- * @slot - This element has a slot
- * @csspart button - The button
- */
 @customElement('kermesse-tracker-app')
 export class KermesseTrackerApp extends LitElement {
   //language=css
