@@ -75,7 +75,7 @@ export class CheckinFromExistingFamily extends LitElement {
           <div class="input-group">
             <input-number id="adultsCount" min="0" .value="${this.adultsCount}" style="width: 40px" 
                           @change="${(e:CustomEvent<number>) => this.updateAdultsCount(e.detail)}">
-              <span slot="label">Adultes</span>
+              <span slot="label">Adu</span>
             </input-number>
           </div>
         </div>
@@ -84,7 +84,7 @@ export class CheckinFromExistingFamily extends LitElement {
           <div class="input-group">
             <input-number id="childrenCount" min="0" .value="${this.nonSchoolChildrenCount}" style="width: 40px"
                           @change="${(e:CustomEvent<number>) => this.updateNonSchoolChildrenCount(e.detail)}">
-              <span slot="label">Enfants</span>
+              <span slot="label">Enf</span>
             </input-number>
           </div>
         </div>
