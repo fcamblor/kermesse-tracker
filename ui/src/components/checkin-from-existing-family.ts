@@ -2,9 +2,7 @@ import {html, css, LitElement} from 'lit'
 import {customElement, property, state} from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 import {repeat} from "lit/directives/repeat.js";
-import {live} from 'lit/directives/live.js';
 import {memberKey} from "../services/Members";
-import {numberInputValue} from "../services/Text";
 
 type CheckinMember = {
     idx: number;
@@ -59,17 +57,19 @@ export class CheckinFromExistingFamily extends LitElement {
         <div class="col-12">
           <label class="visually-hidden" for="adultsCount">Adults count</label>
           <div class="input-group">
-            <div class="input-group-text">Adultes :</div>
-            <input id="adultsCount" type="number" min="0" .value="${live(this.adultsCount)}" 
-                   @change="${(e:InputEvent) => this.updateAdultsCount(e)}" style="width: 55px">
+            <input-number id="adultsCount" min="0" .value="${this.adultsCount}" style="width: 40px" 
+                          @change="${(e:CustomEvent<number>) => this.updateAdultsCount(e.detail)}">
+              <span slot="label">Adultes</span>
+            </input-number>
           </div>
         </div>
         <div class="col-12">
           <label class="visually-hidden" for="childrenCount">Children count</label>
           <div class="input-group">
-            <div class="input-group-text">Enfants :</div>
-            <input id="childrenCount" type="number" min="0" .value="${live(this.nonSchoolChildrenCount)}" 
-                   @change="${(e:InputEvent) => this.updateNonSchoolChildrenCount(e)}" style="width: 55px">
+            <input-number id="childrenCount" min="0" .value="${this.nonSchoolChildrenCount}" style="width: 40px"
+                          @change="${(e:CustomEvent<number>) => this.updateNonSchoolChildrenCount(e.detail)}">
+              <span slot="label">Enfants</span>
+            </input-number>
           </div>
         </div>
       </div>
@@ -148,16 +148,16 @@ export class CheckinFromExistingFamily extends LitElement {
       }
   }
 
-  updateNonSchoolChildrenCount(e: Event) {
-      this.nonSchoolChildrenCount = numberInputValue(e.currentTarget, 0);
+  updateNonSchoolChildrenCount(count: number) {
+      this.nonSchoolChildrenCount = count;
       if(this.nonSchoolChildrenCount + this.adultsCount < this.plannedPresentCheckinMembers.length) {
           this.adultsCount = this.plannedPresentCheckinMembers.length - this.nonSchoolChildrenCount;
       }
       this.updateCheckinMembers();
   }
 
-  updateAdultsCount(e: Event) {
-      this.adultsCount = numberInputValue(e.currentTarget, 0);
+  updateAdultsCount(count: number) {
+      this.adultsCount = count;
       if(this.nonSchoolChildrenCount + this.adultsCount < this.plannedPresentCheckinMembers.length) {
           this.nonSchoolChildrenCount = this.plannedPresentCheckinMembers.length - this.adultsCount;
       }
