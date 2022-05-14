@@ -2,22 +2,32 @@
 declare type Member = {
     firstName: string;
     lastName: string;
-    type: 'adult'|'child'|'schoolchild'
+    isSchoolChild: boolean;
 }
 
 declare type SchoolChild = Member & {
     className: string;
-    type: 'schoolchild'
+    isSchoolChild: true;
 }
 
 declare type Family = {
     lastName: string;
     members: Member[];
     schoolChildren: SchoolChild[];
+    plannedCounts: {
+        adults: number;
+        schoolChildren: number;
+        nonSchoolChildren: number;
+    }
 }
 
 declare type Checkin = {
     isoDate: string;
     members: Member[];
     familyLastName?: string;
+    counts: {
+        adults: number;
+        schoolChildren: number;
+        nonSchoolChildren: number;
+    }
 }

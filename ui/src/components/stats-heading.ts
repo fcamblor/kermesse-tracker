@@ -20,8 +20,8 @@ export class StatsHeading extends LitElement {
 
   render() {
     return html`
-      Adultes: ${this.checkins.reduce((total, checkin) => total + checkin.members.filter(m => m.type==='adult').length, 0)}
-      | Enfants: ${this.checkins.reduce((total, checkin) => total + checkin.members.filter(m => m.type!=='adult').length, 0)}
+      Adultes: ${this.checkins.reduce((total, checkin) => total + checkin.counts.adults, 0)}
+      | Enfants: ${this.checkins.reduce((total, checkin) => total + checkin.counts.nonSchoolChildren, 0)}
     `
   }
 }
