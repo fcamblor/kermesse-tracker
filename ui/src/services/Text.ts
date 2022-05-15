@@ -24,7 +24,7 @@ export function numberInputValue(eventTarget: EventTarget|null, fallbackValue: n
     return isNaN(inputEl.valueAsNumber)?fallbackValue:inputEl.valueAsNumber;
 }
 
-export function inputValue(eventTarget: EventTarget|null, fallbackValue?: string|undefined): string|undefined {
+export function inputValue(eventTarget: EventTarget|null, fallbackValue: string|undefined = undefined): string|undefined {
     if(!eventTarget) {
         return fallbackValue;
     }

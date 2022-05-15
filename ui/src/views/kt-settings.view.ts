@@ -6,6 +6,9 @@ import {Router} from "../routing/Router";
 import {inputValue} from "../services/Text";
 import {AuthClient} from "../clients/AuthClient";
 
+const PROD_URL = "https://kermesse-tracker.herokuapp.com";
+const LOCAL_URL = "http://localhost:3000";
+
 @customElement('kt-settings')
 export class KTSettingsView extends LitElement {
     //language=css
@@ -18,9 +21,9 @@ export class KTSettingsView extends LitElement {
     }
     `]
 
-    @state() deviceName: string|undefined = GlobalState.INSTANCE.settings()?.deviceName
-    @state() baseUrl: string|undefined = GlobalState.INSTANCE.settings()?.baseUrl
-    @state() authToken: string|undefined = GlobalState.INSTANCE.settings()?.authToken
+    @state() deviceName: string = GlobalState.INSTANCE.settings()?.deviceName || ""
+    @state() baseUrl: string = GlobalState.INSTANCE.settings()?.baseUrl || PROD_URL
+    @state() authToken: string = GlobalState.INSTANCE.settings()?.authToken || ""
 
     @state()
     authTokenVerified: boolean = false;
@@ -44,8 +47,8 @@ export class KTSettingsView extends LitElement {
               <label for="baseUrl" class="col-sm-8 col-form-label col-form-label-lg">Serveur</label>
               <div class="col-sm-16">
                 <select class="form-select form-select-lg" id="baseUrl" @change="${(e: InputEvent) => this.baseUrlUpdated(e)}">
-                  <option value="https://kermesse-tracker.herokuapp.com" .checked="${this.baseUrl===undefined || this.baseUrl==='https://kermesse-tracker.herokuapp.com'}">Prod</option>
-                  <option value="http://localhost:3000" .checked="${this.baseUrl==='http://localhost:3000'}">Localhost</option>
+                  <option value="${PROD_URL}" .checked="${this.baseUrl===undefined || this.baseUrl===PROD_URL}">Prod</option>
+                  <option value="${LOCAL_URL}" .checked="${this.baseUrl===LOCAL_URL}">Localhost</option>
                 </select>
               </div>
             </div>
@@ -65,16 +68,16 @@ export class KTSettingsView extends LitElement {
     }
 
     deviceNameUpdated(event: InputEvent) {
-        this.deviceName = inputValue(event.currentTarget);
+        this.deviceName = inputValue(event.currentTarget) || "";
     }
 
     baseUrlUpdated(event: InputEvent) {
-        this.baseUrl = inputValue(event.currentTarget);
+        this.baseUrl = inputValue(event.currentTarget) || "";
         this.verifyAuthToken();
     }
 
     authTokenUpdated(event: InputEvent) {
-        this.authToken = inputValue(event.currentTarget);
+        this.authToken = inputValue(event.currentTarget) || "";
         this.verifyAuthToken();
     }
 
