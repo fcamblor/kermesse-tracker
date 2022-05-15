@@ -1,3 +1,4 @@
+import {stripEnd, stripStart} from "../services/Text";
 
 
 type DatasourceConfig = {
@@ -20,10 +21,7 @@ export class ClientDatasource {
     private config: DatasourceConfig|undefined = undefined;
 
     public use(config: DatasourceConfig) {
-        this.config = config;
-        if(this.config.baseUrl.endsWith("/")) {
-            this.config.baseUrl = this.config.baseUrl.substring(0, this.config.baseUrl.length-1);
-        }
+        this.config = { ...config, baseUrl: stripEnd(config.baseUrl, "/") };
     }
 
     public async query<T, R = void>(opts: QueryConfig<T, R>): Promise<R> {
@@ -33,7 +31,7 @@ export class ClientDatasource {
 
         const url = this.config.baseUrl
             + '/'
-            + opts.path.substring(opts.path.startsWith("/")?1:0)
+            + stripStart(opts.path, "/")
             + (opts.queryParams?`?${new URLSearchParams(opts.queryParams)}`:"");
 
         const resp = await fetch(url, {

@@ -1,5 +1,6 @@
 import page from "page";
 import {html, TemplateResult} from "lit";
+import {stripEnd, stripStart} from "../services/Text";
 
 export type SlottedTemplateResultFactory = (subViewSlot: TemplateResult) => TemplateResult;
 
@@ -25,14 +26,14 @@ class Routing {
     private _currentPath: string|undefined = undefined;
 
     public get basePath() {
-        return import.meta.env.BASE_URL;
+        return stripEnd(import.meta.env.BASE_URL, "/");
     }
 
     installRoutes(callback?: ViewChangedCallback): ViewChangedCallbackCleaner|undefined {
         const callbackCleaner = callback?this.onViewChanged(callback):undefined;
 
-        page.redirect(`${this.basePath}home`, `/`);
-        page.redirect(`${this.basePath}index.html`, `/`);
+        page.redirect(`${this.basePath}/home`, `/`);
+        page.redirect(`${this.basePath}/index.html`, `/`);
 
         this.declareRoutes('/', {
             doFirst: async () => import('../views/kt-home.view'),
@@ -59,7 +60,7 @@ class Routing {
 
     private _declareRoute(path: string, doFirst: () => Promise<any>, viewComponentCreator: (pathParams: Record<string, string>) => Promise<SlottedTemplateResultFactory>|SlottedTemplateResultFactory,
                           titlePromise = Routing.DEFAULT_TITLE_PROMISE) {
-        page(`${this.basePath}${path.substring(path[0]==='/'?1:0)}`, async (context) => {
+        page(`${this.basePath}/${stripStart(path, '/')}`, async (context) => {
             await doFirst();
 
             const slottedViewComponentFactoryResult = viewComponentCreator(context.params);
@@ -88,7 +89,7 @@ class Routing {
     }
 
     navigateToHome() {
-        page(`${this.basePath}`);
+        page(`${this.basePath}/`);
     }
 
     navigateToUrlIfPossible(url: string) {

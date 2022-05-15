@@ -31,3 +31,10 @@ export function padLeft(str: string, size: number, filler: string) {
     }
     return result;
 }
+
+export function stripEnd(str: string, strippingStr: string): string {
+    return str.substring(0, str.length - (str.endsWith(strippingStr)?strippingStr.length:0));
+}
+export function stripStart(str: string, strippingStr: string): string {
+    return str.substring(str.startsWith(strippingStr)?strippingStr.length:0);
+}
