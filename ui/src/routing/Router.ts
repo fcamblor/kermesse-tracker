@@ -47,6 +47,10 @@ class Routing {
                 ${subViewSlot}
               </kt-checkin-from-existing-family>`
         })
+        this.declareRoutes('/settings', {
+            doFirst: async () => import('../views/kt-settings.view'),
+            viewContent: async () => (subViewSlot) => html`<kt-settings>${subViewSlot}</kt-settings>`
+        })
 
         page(`*`, () => this.navigateToHome());
         page();
@@ -96,9 +100,8 @@ class Routing {
         }
     }
 
-    navigateToHome() {
-        page(`${this.basePath}/`);
-    }
+    navigateToHome() { page(`${this.basePath}/`); }
+    navigateToSettingsPage() { page(`${this.basePath}/settings`) }
 
     navigateToCheckinFromExistingFamilyFor(member: Member) {
         page(`${this.basePath}/checkin-from-existing-family/${encodeMemberToUrlParam(member)}`)

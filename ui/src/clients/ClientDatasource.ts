@@ -1,7 +1,7 @@
 import {stripEnd, stripStart} from "../services/Text";
 
 
-type DatasourceConfig = {
+export type DatasourceConfig = {
     baseUrl: string;
     authToken: string;
 }
@@ -20,8 +20,13 @@ export class ClientDatasource {
     public static readonly INSTANCE = new ClientDatasource();
     private config: DatasourceConfig|undefined = undefined;
 
-    public use(config: DatasourceConfig) {
+    public isConfigured(): boolean {
+        return !!this.config;
+    }
+
+    public use(config: DatasourceConfig): this {
         this.config = { ...config, baseUrl: stripEnd(config.baseUrl, "/") };
+        return this;
     }
 
     public async query<T, R = void>(opts: QueryConfig<T, R>): Promise<R> {
@@ -42,6 +47,10 @@ export class ClientDatasource {
             },
             body: (opts.method==='PUT'||opts.method==='POST')?JSON.stringify(opts.data):undefined,
         });
+
+        if(resp.status < 200 || resp.status >= 300) {
+            throw new Error(`Error while calling ${opts.method} ${url} => status=${resp.status} ${await resp.text()}`)
+        }
 
         const resultBeforeTransformation = await resp.json();
         const transformer = opts.dataTransformer || ((res: R) => res)

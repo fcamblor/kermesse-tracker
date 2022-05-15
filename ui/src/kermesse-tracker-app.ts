@@ -36,6 +36,10 @@ export class KermesseTrackerApp extends LitElement {
           Router.installRoutes((viewTemplateResult) => {
             this.viewTemplateResult = viewTemplateResult;
           })
+
+          if(!ClientDatasource.INSTANCE.isConfigured()) {
+            Router.navigateToSettingsPage();
+          }
         })
   }
 

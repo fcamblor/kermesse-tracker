@@ -24,6 +24,14 @@ export function numberInputValue(eventTarget: EventTarget|null, fallbackValue: n
     return isNaN(inputEl.valueAsNumber)?fallbackValue:inputEl.valueAsNumber;
 }
 
+export function inputValue(eventTarget: EventTarget|null, fallbackValue?: string|undefined): string|undefined {
+    if(!eventTarget) {
+        return fallbackValue;
+    }
+    const inputEl = eventTarget as HTMLInputElement;
+    return inputEl.value;
+}
+
 export function padLeft(str: string, size: number, filler: string) {
     let result = str;
     while(result.length < size) {
