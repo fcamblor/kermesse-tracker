@@ -14,6 +14,11 @@ class Persistor<T> {
         const obj: T = persistedStr?JSON.parse(persistedStr):this.fallbackValueFactory();
         return Promise.resolve(obj);
     }
+
+    delete(): Promise<void> {
+        localStorage.removeItem(this.storeName);
+        return Promise.resolve();
+    }
 }
 
 export const PersistedCheckins = new Persistor<Checkin[]>("checkins", () => [])

@@ -2,8 +2,6 @@ import {html, css, LitElement} from 'lit'
 import { customElement, state } from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 import {GlobalState} from "../state/GlobalState.state";
-import {PersistedSettings} from "../persistance/LocalstoragePersistor";
-import {ClientDatasource} from "../clients/ClientDatasource";
 import {Router} from "../routing/Router";
 import {inputValue} from "../services/Text";
 import {AuthClient} from "../clients/AuthClient";
@@ -93,18 +91,14 @@ export class KTSettingsView extends LitElement {
         return this.baseUrl && this.deviceName && this.authToken && this.authTokenVerified;
     }
 
-    submitSettings() {
+    async submitSettings() {
         const settings: Settings = {
             baseUrl: this.baseUrl!,
             authToken: this.authToken!,
             deviceName: this.deviceName!
         };
 
-        PersistedSettings.store(settings);
-        ClientDatasource.INSTANCE.use({
-            baseUrl: settings.baseUrl!,
-            authToken: settings.authToken!
-        })
+        await GlobalState.INSTANCE.updateSettings(settings);
 
         Router.navigateToHome();
     }

@@ -45,8 +45,7 @@ export class GlobalState {
             }),
             PersistedSettings.load().then(settings => {
                 if(settings !== this._settings) {
-                    this._settings = settings;
-                    this.triggerEvent("change:settings", this._settings?deepCloneObjectLiteral(this._settings):undefined);
+                    this.updateSettings(settings);
                 }
             })
         ])
@@ -58,5 +57,17 @@ export class GlobalState {
     public async addLocalCheckin(checkin: Checkin) {
         this._localCheckins.push(checkin);
         await PersistedCheckins.store(this._localCheckins);
+    }
+
+    public async updateSettings(settings: Settings|undefined, skipStoring: boolean = false) {
+        if(!skipStoring) {
+            if(settings) {
+                await PersistedSettings.store(settings);
+            } else {
+                await PersistedSettings.delete();
+            }
+        }
+        this._settings = settings;
+        this.triggerEvent("change:settings", this._settings?deepCloneObjectLiteral(this._settings):undefined);
     }
 }
