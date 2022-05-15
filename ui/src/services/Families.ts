@@ -18,3 +18,7 @@ export function findFamilyContaining(families: Family[], member: Member): Family
 export function familyMembers(family: Family): Member[] {
     return family.members.concat(family.schoolChildren);
 }
+
+export function familiesMembers(families: Family[]): Member[] {
+    return families.flatMap(familyMembers);
+}

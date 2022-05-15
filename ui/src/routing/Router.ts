@@ -1,6 +1,7 @@
 import page from "page";
 import {html, TemplateResult} from "lit";
 import {stripEnd, stripStart} from "../services/Text";
+import {encodeMemberToUrlParam} from "../services/Members";
 
 export type SlottedTemplateResultFactory = (subViewSlot: TemplateResult) => TemplateResult;
 
@@ -39,6 +40,13 @@ class Routing {
             doFirst: async () => import('../views/kt-home.view'),
             viewContent: async () => (subViewSlot) => html`<kt-home>${subViewSlot}</kt-home>`
         });
+        this.declareRoutes('/checkin-from-existing-family/:encodedMember', {
+            doFirst: async () => import('../views/kt-checkin-from-existing-family.view'),
+            viewContent: async (pathParams) => (subViewSlot) => html`
+              <kt-checkin-from-existing-family encoded-member="${pathParams['encodedMember']}">
+                ${subViewSlot}
+              </kt-checkin-from-existing-family>`
+        })
 
         page(`*`, () => this.navigateToHome());
         page();
@@ -90,6 +98,10 @@ class Routing {
 
     navigateToHome() {
         page(`${this.basePath}/`);
+    }
+
+    navigateToCheckinFromExistingFamilyFor(member: Member) {
+        page(`${this.basePath}/checkin-from-existing-family/${encodeMemberToUrlParam(member)}`)
     }
 
     navigateToUrlIfPossible(url: string) {

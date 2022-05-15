@@ -2,6 +2,8 @@ import {html, css, LitElement} from 'lit'
 import { customElement, state } from 'lit/decorators.js'
 import {CSS_Global} from "./styles/ConstructibleStyleSheets";
 import {Router, SlottedTemplateResultFactory} from "./routing/Router";
+import {ClientDatasource} from "./clients/ClientDatasource";
+import {GlobalState} from "./state/GlobalState.state";
 
 @customElement('kermesse-tracker-app')
 export class KermesseTrackerApp extends LitElement {
@@ -19,9 +21,13 @@ export class KermesseTrackerApp extends LitElement {
 
   constructor() {
     super();
-    Router.installRoutes((viewTemplateResult) => {
-      this.viewTemplateResult = viewTemplateResult;
-    })
+
+    GlobalState.INSTANCE.init()
+        .then(() => {
+          Router.installRoutes((viewTemplateResult) => {
+            this.viewTemplateResult = viewTemplateResult;
+          })
+        })
   }
 
   render() {

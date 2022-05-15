@@ -1,11 +1,19 @@
 import {html, css, LitElement} from 'lit'
-import {customElement, property, state} from 'lit/decorators.js'
+import {customElement, state} from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 import {repeat} from "lit/directives/repeat.js";
-import {memberKey} from "../services/Members";
-import {findFamilyMembersNeverCheckedIn, pastCheckinMembers} from "../services/Checkins";
+import {decodeMemberUrlParam, memberKey} from "../services/Members";
+import {
+    findFamilyMembersNeverCheckedIn,
+    findPastCheckinsMatchingFamily,
+    pastCheckinMembers
+} from "../services/Checkins";
 import {formatTime} from "../services/DateAndTimes";
 import {toFullTextNormalized} from "../services/Text";
+import {FamiliesClient} from "../clients/FamiliesClient";
+import {familiesMembers, findFamilyContaining} from "../services/Families";
+import {GlobalState} from "../state/GlobalState.state";
+import {Router} from "../routing/Router";
 
 type CheckinMember = {
     idx: number;
@@ -14,8 +22,8 @@ type CheckinMember = {
     isPlanned: boolean;
 } & ({ isPlanned: true, present: boolean } | { isPlanned: false, present: true })
 
-@customElement('checkin-from-existing-family')
-export class CheckinFromExistingFamily extends LitElement {
+@customElement('kt-checkin-from-existing-family')
+export class KTCheckinFromExistingFamilyView extends LitElement {
   //language=css
   static styles = [
       CSS_Global,
@@ -27,28 +35,44 @@ export class CheckinFromExistingFamily extends LitElement {
     }
   `]
 
-  @property({type: Object})
-  set familyWithCheckins(familyWithCheckins: FamilyWithCheckins) {
-    this._family = familyWithCheckins.family;
-    this._pastCheckins = familyWithCheckins.pastCheckins;
-
-    if(familyWithCheckins.pastCheckins.length) {
-        const familyMembersNeverCheckedIn = findFamilyMembersNeverCheckedIn(this._family, familyWithCheckins.pastCheckins);
-        this.adultsCount = familyMembersNeverCheckedIn.length;
-        this.nonSchoolChildrenCount = 0
-        this.pastCheckinMembers = pastCheckinMembers(familyWithCheckins.pastCheckins);
-        this.nonCheckedInMembers = familyMembersNeverCheckedIn;
-    } else {
-        this.adultsCount = this._family.plannedCounts.adults;
-        this.nonSchoolChildrenCount = this._family.plannedCounts.nonSchoolChildren;
-        this.pastCheckinMembers = [];
-        this.nonCheckedInMembers = this._family.members;
+    constructor(){
+      super();
+      console.log(this.attributes);
     }
 
-    this.updateCheckinMembers(false);
-  }
-  _family!: Family;
-  _pastCheckins!: Checkin[];
+    async connectedCallback() {
+        super.connectedCallback();
+
+        const encodedMember = this.attributes.getNamedItem("encoded-member");
+        if(!encodedMember) {
+            throw new Error("Missing encoded-member attribute on kt-checkin-from-existing-family view !");
+        }
+
+        const families = await FamiliesClient.INSTANCE.fetchFamilies(new Date().getFullYear());
+        const members = familiesMembers(families);
+        const member = decodeMemberUrlParam(members, encodedMember.value);
+
+        this._family = findFamilyContaining(families, member);
+        this._pastCheckins = findPastCheckinsMatchingFamily(GlobalState.INSTANCE.localCheckins(), this._family);
+
+        if(this._pastCheckins.length) {
+            const familyMembersNeverCheckedIn = findFamilyMembersNeverCheckedIn(this._family, this._pastCheckins);
+            this.adultsCount = familyMembersNeverCheckedIn.length;
+            this.nonSchoolChildrenCount = 0
+            this.pastCheckinMembers = pastCheckinMembers(this._pastCheckins);
+            this.nonCheckedInMembers = familyMembersNeverCheckedIn;
+        } else {
+            this.adultsCount = this._family.plannedCounts.adults;
+            this.nonSchoolChildrenCount = this._family.plannedCounts.nonSchoolChildren;
+            this.pastCheckinMembers = [];
+            this.nonCheckedInMembers = this._family.members;
+        }
+
+        this.updateCheckinMembers(false);
+    }
+
+  _family: Family|undefined = undefined;
+  _pastCheckins: Checkin[]|undefined = undefined;
 
   @state() adultsCount!: number;
   @state() nonSchoolChildrenCount!: number;
@@ -63,7 +87,7 @@ export class CheckinFromExistingFamily extends LitElement {
     return html`
       <h4>Enfants scolarisés</h4>
       <ul>
-        ${repeat(this._family.schoolChildren, memberKey, (schoolChild: SchoolChild) => html`
+        ${repeat(this._family?.schoolChildren || [], memberKey, (schoolChild: SchoolChild) => html`
           <li><strong>${schoolChild.lastName.toUpperCase()} ${schoolChild.firstName}</strong> (${schoolChild.className})</li>
         `)}
       </ul>
@@ -133,7 +157,7 @@ export class CheckinFromExistingFamily extends LitElement {
         <button type="button" class="btn btn-lg btn-warning" @click="${() => this.cancelCheckin()}">Retour</button>
       </div>
       
-      ${this._pastCheckins.length?html`
+      ${this._pastCheckins?.length?html`
       <hr class="m-2"/>
       <h4>Checkins précédents</h4>
         <ul>
@@ -261,14 +285,13 @@ export class CheckinFromExistingFamily extends LitElement {
   }
 
   cancelCheckin(): void {
-      this.dispatchEvent(new CustomEvent<void>('on-checkin-cancelled', {
-      }));
+      Router.navigateToHome();
   }
 
-  submitCheckin(): void {
+  async submitCheckin() {
       const checkin: Checkin = {
           isoDate: new Date().toISOString(),
-          familyLastName: this._family.schoolChildren[0].lastName,
+          familyLastName: this._family!.schoolChildren[0].lastName,
           members: ([] as Member[])
               .concat(...this.checkinMembers.filter(cm => cm.present).map(cm => ({
                   firstName: cm.firstName,
@@ -278,17 +301,18 @@ export class CheckinFromExistingFamily extends LitElement {
           counts: {
               adults: this.adultsCount,
               nonSchoolChildren: this.nonSchoolChildrenCount,
-              schoolChildren: this._family.schoolChildren.length
+              schoolChildren: this._family!.schoolChildren.length
           }
       };
-      this.dispatchEvent(new CustomEvent<Checkin>('on-checkin-performed', {
-          detail: checkin
-      }));
+
+      await GlobalState.INSTANCE.addLocalCheckin(checkin);
+
+      Router.navigateToHome();
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'checkin-from-existing-family': CheckinFromExistingFamily
+    'kt-checkin-from-existing-family': KTCheckinFromExistingFamilyView
   }
 }
