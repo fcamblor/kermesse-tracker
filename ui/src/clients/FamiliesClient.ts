@@ -1,9 +1,11 @@
 import {ClientDatasource} from "./ClientDatasource";
+import {MemoizeExpiring} from "typescript-memoize";
 
 
 export class FamiliesClient {
     public static readonly INSTANCE = new FamiliesClient();
 
+    @MemoizeExpiring(1000*60*60, (year: number) => year)
     public async fetchFamilies(year: number): Promise<Family[]> {
         return await ClientDatasource.INSTANCE.query({
             method: 'GET',

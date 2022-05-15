@@ -15,7 +15,8 @@
   "dependencies": {
     "bootstrap": "5.1.3",
     "lit": "2.2.3",
-    "page": "1.11.6"
+    "page": "1.11.6",
+    "typescript-memoize": "1.1.0"
   },
   "devDependencies": {
     "@types/page": "1.11.5",
