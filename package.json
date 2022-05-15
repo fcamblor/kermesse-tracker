@@ -6,7 +6,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "build": "cd ui && npm ci && vite build --outDir ../srv/public/ui/ --base /public/ui/ && cd ../srv && npm ci && npm run build"
+    "build": "cd ui && npm ci && npm run build && cd ../srv && npm ci && npm run build"
   },
   "dependencies": {
   },
