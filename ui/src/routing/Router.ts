@@ -53,7 +53,9 @@ class Routing {
         })
 
         page(`*`, () => this.navigateToHome());
-        page();
+        page({
+            dispatch: false
+        });
 
         return callbackCleaner;
     }

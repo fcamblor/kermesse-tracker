@@ -38,7 +38,9 @@ export class KermesseTrackerApp extends LitElement {
           })
 
           if(!ClientDatasource.INSTANCE.isConfigured()) {
-            Router.navigateToSettingsPage();
+              Router.navigateToSettingsPage();
+          } else {
+              Router.navigateToHome();
           }
         })
   }
