@@ -103,7 +103,7 @@ class Routing {
     }
 
     navigateToHome() { page(`${this.basePath}/`); }
-    navigateToSettingsPage() { page(`${this.basePath}/settings`) }
+    navigateToSettingsPage() { page(`${this.basePath}/settings${location.search}`) }
 
     navigateToCheckinFromExistingFamilyFor(member: Member) {
         page(`${this.basePath}/checkin-from-existing-family/${encodeMemberToUrlParam(member)}`)

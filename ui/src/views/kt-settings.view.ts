@@ -23,7 +23,7 @@ export class KTSettingsView extends LitElement {
 
     @state() deviceName: string = GlobalState.INSTANCE.settings()?.deviceName || ""
     @state() baseUrl: string = GlobalState.INSTANCE.settings()?.baseUrl || PROD_URL
-    @state() authToken: string = GlobalState.INSTANCE.settings()?.authToken || ""
+    @state() authToken: string = new URLSearchParams(window.location.search).get("authToken") || GlobalState.INSTANCE.settings()?.authToken || ""
 
     @state()
     authTokenVerified: boolean = false;
