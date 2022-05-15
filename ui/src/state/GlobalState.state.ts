@@ -1,4 +1,4 @@
-import {PersistedCheckins} from "../persistance/PersistedCheckins";
+import {PersistedCheckins} from "../persistance/LocalstoragePersistor";
 
 export class GlobalState {
     public static readonly INSTANCE = new GlobalState();
