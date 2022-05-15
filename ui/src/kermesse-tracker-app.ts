@@ -5,6 +5,7 @@ import {MemberSelected} from "./components/people-selector";
 import {familyMembers, findFamilyContaining} from "./services/Families";
 import {PersistedCheckins} from "./persistance/PersistedCheckins";
 import {findPastCheckinsMatchingFamily} from "./services/Checkins";
+import {FamiliesClient} from "./clients/FamiliesClient";
 
 @customElement('kermesse-tracker-app')
 export class KermesseTrackerApp extends LitElement {
@@ -30,15 +31,10 @@ export class KermesseTrackerApp extends LitElement {
   constructor() {
     super();
 
-    fetch('https://gist.githubusercontent.com/fcamblor/277f0d79f6ae94f3ebcc7c183973c21f/raw/kermesse-2022.json')
-        .then(resp => resp.json())
-        .then(payload => {
-          this.families = payload.families.map((f: Family) => ({
-            ...f,
-            schoolChildren: f.schoolChildren.map((sc: Omit<SchoolChild, "isSchoolChild">) => ({...sc, isSchoolChild: true})),
-            members: f.members.map((m: Omit<Member, "isSchoolChild">) => ({...m, isSchoolChild: false})),
-          }));
-        });
+    FamiliesClient.INSTANCE.fetchFamilies(new Date().getFullYear())
+        .then(families => {
+          this.families = families;
+        })
 
     PersistedCheckins.load()
         .then((checkins) => {
