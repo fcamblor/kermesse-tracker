@@ -36,3 +36,16 @@ declare type FamilyWithCheckins = {
     family: Family;
     pastCheckins: Checkin[];
 }
+
+declare type Settings = {
+    baseUrl: string;
+    authToken: string;
+    deviceName: string;
+}
+
+declare type JSONValue =
+    | string
+    | number
+    | boolean
+    | { [x: string]: JSONValue }
+    | Array<JSONValue>;

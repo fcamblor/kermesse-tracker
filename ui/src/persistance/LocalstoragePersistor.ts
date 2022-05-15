@@ -17,3 +17,4 @@ class Persistor<T> {
 }
 
 export const PersistedCheckins = new Persistor<Checkin[]>("checkins", () => [])
+export const PersistedSettings = new Persistor<Settings|undefined>("settings", () => undefined)

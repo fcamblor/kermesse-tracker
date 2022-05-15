@@ -22,6 +22,15 @@ export class KermesseTrackerApp extends LitElement {
   constructor() {
     super();
 
+    GlobalState.INSTANCE.subscribe("change:settings", (settings) => {
+        if(settings) {
+            ClientDatasource.INSTANCE.use({
+                baseUrl: settings.baseUrl,
+                authToken: settings.authToken
+            })
+        }
+    })
+
     GlobalState.INSTANCE.init()
         .then(() => {
           Router.installRoutes((viewTemplateResult) => {
