@@ -1,5 +1,5 @@
 import {PersistedCheckins, PersistedSettings} from "../persistance/LocalstoragePersistor";
-import {deepCloneObjectLiteral} from "../services/ObjectLiterals";
+import {deepCloneObjectLiteral} from "@shared/domain/ObjectLiterals";
 
 type StateEventTypes = {
     "change:settings": Settings|undefined

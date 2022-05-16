@@ -4,8 +4,8 @@ import {classMap} from 'lit/directives/class-map.js';
 import {customElement, property, query, state} from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 import peopleSelectorCss from "./people-selector.scss";
-import { toFullTextNormalized } from '../services/Text';
-import {memberKey} from "../services/Members";
+import { toFullTextNormalized } from '@shared/domain/Text';
+import {memberKey} from "@shared/domain/Members";
 import {SVG_CLOSE_ICON} from "../services/SVGs";
 
 export type MemberSelected = { member: Member };

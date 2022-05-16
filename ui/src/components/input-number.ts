@@ -2,7 +2,7 @@ import {html, css, LitElement} from 'lit'
 import {customElement, property, query} from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 import {live} from "lit/directives/live.js";
-import {numberInputValue} from "../services/Text";
+import {numberInputValue} from "../services/Inputs";
 import {SVG_MINUS_ICON, SVG_PLUS_ICON} from "../services/SVGs";
 
 

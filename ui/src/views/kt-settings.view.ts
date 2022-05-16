@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 import {GlobalState} from "../state/GlobalState.state";
 import {Router} from "../routing/Router";
-import {inputValue} from "../services/Text";
+import {inputValue} from "../services/Inputs";
 import {AuthClient} from "../clients/AuthClient";
 
 const PROD_URL = "https://kermesse-tracker.herokuapp.com";

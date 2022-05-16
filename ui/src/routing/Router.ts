@@ -1,6 +1,6 @@
 import page, {Options as PageJSOptions} from "page";
 import {html, TemplateResult} from "lit";
-import {stripEnd, stripStart} from "../services/Text";
+import {stripEnd, stripStart} from "@shared/domain/Text";
 import {encodeMemberToUrlParam} from "../services/Members";
 
 export type SlottedTemplateResultFactory = (subViewSlot: TemplateResult) => TemplateResult;

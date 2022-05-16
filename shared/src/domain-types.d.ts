@@ -5,6 +5,8 @@ declare type Member = {
     isSchoolChild: boolean;
 }
 
+declare type FirstAndLastMemberName = Pick<Member, "firstName"|"lastName">;
+
 declare type SchoolChild = Member & {
     className: string;
     isSchoolChild: true;

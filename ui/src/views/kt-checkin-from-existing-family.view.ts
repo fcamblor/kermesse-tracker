@@ -2,16 +2,17 @@ import {html, css, LitElement} from 'lit'
 import {customElement, state} from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 import {repeat} from "lit/directives/repeat.js";
-import {decodeMemberUrlParam, memberKey} from "../services/Members";
+import {memberKey} from "@shared/domain/Members";
+import {decodeMemberUrlParam} from "../services/Members";
 import {
     findFamilyMembersNeverCheckedIn,
     findPastCheckinsMatchingFamily,
     pastCheckinMembers
-} from "../services/Checkins";
-import {formatTime} from "../services/DateAndTimes";
-import {toFullTextNormalized} from "../services/Text";
+} from "@shared/domain/Checkins";
+import {formatTime} from "@shared/domain/DateAndTimes";
+import {toFullTextNormalized} from "@shared/domain/Text";
 import {FamiliesClient} from "../clients/FamiliesClient";
-import {familiesMembers, findFamilyContaining} from "../services/Families";
+import {familiesMembers, findFamilyContaining} from "@shared/domain/Families";
 import {GlobalState} from "../state/GlobalState.state";
 import {Router} from "../routing/Router";
 

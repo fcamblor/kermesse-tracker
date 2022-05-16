@@ -2,7 +2,7 @@ import {html, css, LitElement} from 'lit'
 import { customElement, state } from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 import {MemberSelected} from "../components/people-selector";
-import {familyMembers} from "../services/Families";
+import {familyMembers} from "@shared/domain/Families";
 import {FamiliesClient} from "../clients/FamiliesClient";
 
 import "../components/stats-heading"
