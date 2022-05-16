@@ -33,14 +33,12 @@ export class KermesseTrackerApp extends LitElement {
 
     GlobalState.INSTANCE.init()
         .then(() => {
-          Router.installRoutes((viewTemplateResult) => {
+          Router.installRoutes({ dispatch: ClientDatasource.INSTANCE.isConfigured() }, (viewTemplateResult) => {
             this.viewTemplateResult = viewTemplateResult;
           })
 
           if(!ClientDatasource.INSTANCE.isConfigured()) {
               Router.navigateToSettingsPage();
-          } else {
-              Router.navigateToHome();
           }
         })
   }

@@ -1,4 +1,4 @@
-import page from "page";
+import page, {Options as PageJSOptions} from "page";
 import {html, TemplateResult} from "lit";
 import {stripEnd, stripStart} from "../services/Text";
 import {encodeMemberToUrlParam} from "../services/Members";
@@ -30,7 +30,7 @@ class Routing {
         return stripEnd(import.meta.env.BASE_URL, "/");
     }
 
-    installRoutes(callback?: ViewChangedCallback): ViewChangedCallbackCleaner|undefined {
+    installRoutes(pageJsOptions: Partial<PageJSOptions>, callback?: ViewChangedCallback): ViewChangedCallbackCleaner|undefined {
         const callbackCleaner = callback?this.onViewChanged(callback):undefined;
 
         page.redirect(`${this.basePath}/home`, `/`);
@@ -53,9 +53,7 @@ class Routing {
         })
 
         page(`*`, () => this.navigateToHome());
-        page({
-            dispatch: false
-        });
+        page(pageJsOptions);
 
         return callbackCleaner;
     }
