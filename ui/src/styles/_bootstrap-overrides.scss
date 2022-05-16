@@ -1,0 +1,15 @@
+@import 'bootstrap/scss/functions';
+@import "bootstrap-variables";
+
+input,
+label {
+  font-weight: $input-font-weight;
+  line-height: $line-height-base;
+  border-width: $input-border-width;
+  border-color: $input-border-color;
+  border-radius: $border-radius-lg;
+
+  @include media-breakpoint-up(md) {
+    font-size: calc(1.325rem + 0.9vw);
+  }
+}
