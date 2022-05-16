@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {Db} from "./db";
-import {Optional} from "../utils/optional";
+import {Optional} from "@shared/utils/Optional";
 
 @Injectable()
 export class FamiliesDAO {

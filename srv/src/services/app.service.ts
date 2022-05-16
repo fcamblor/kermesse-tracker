@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {FamiliesDAO} from "../persistance/families.dao";
-import {Optional} from "../utils/optional";
+import {Optional} from "@shared/utils/Optional";
 
 @Injectable()
 export class AppService {
