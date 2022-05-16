@@ -1,0 +1,14 @@
+{
+  "name": "kt-domain",
+  "version": "0.0.0",
+  "description": "Domain types/classes for kermesse-tracker",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "4.6.4"
+  },
+  "author": "fcamblor",
+  "license": "MIT"
+}
