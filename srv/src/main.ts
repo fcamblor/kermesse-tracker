@@ -1,3 +1,5 @@
+/// <reference path="../../shared/src/domain-types.d.ts" />
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as bodyParser from 'body-parser';
