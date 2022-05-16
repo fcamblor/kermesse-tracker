@@ -19,7 +19,7 @@
     "useDefineForClassFields": false,
     "skipLibCheck": true,
     "paths": {
-      "@shared/*": ["../shared/dist/*"]
+      "@shared/*": ["../shared/dist/mjs/*"]
     }
   },
   "include": ["src/**/*.ts"],
