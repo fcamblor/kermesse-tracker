@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && npx vite build --outDir ../srv/public/ui/ --base /public/ui/"
+    "build": "tsc && rm -Rf ../srv/public/ui/ && npx vite build --outDir ../srv/public/ui/ --base /public/ui/"
   },
   "dependencies": {
     "bootstrap": "5.1.3",
