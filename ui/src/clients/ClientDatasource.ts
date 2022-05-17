@@ -1,4 +1,4 @@
-import {stripEnd, stripStart} from "@shared/domain/Text";
+import {stripEnd, stripStart} from "@shared/utils/Text";
 
 
 export type DatasourceConfig = {

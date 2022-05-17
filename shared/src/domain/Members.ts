@@ -1,4 +1,4 @@
-import {toFullTextNormalized} from "./Text";
+import {toFullTextNormalized} from "../utils/Text";
 
 export function membersMatch(member1: FirstAndLastMemberName, member2: FirstAndLastMemberName): boolean {
     return toFullTextNormalized(member1.lastName).toLowerCase() === toFullTextNormalized(member2.lastName).toLowerCase()

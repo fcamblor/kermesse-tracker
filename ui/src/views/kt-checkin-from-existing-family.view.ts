@@ -9,8 +9,8 @@ import {
     findPastCheckinsMatchingFamily,
     pastCheckinMembers
 } from "@shared/domain/Checkins";
-import {formatTime} from "@shared/domain/DateAndTimes";
-import {toFullTextNormalized} from "@shared/domain/Text";
+import {formatTime} from "@shared/utils/DateAndTimes";
+import {toFullTextNormalized} from "@shared/utils/Text";
 import {FamiliesClient} from "../clients/FamiliesClient";
 import {familiesMembers, findFamilyContaining} from "@shared/domain/Families";
 import {GlobalState} from "../state/GlobalState.state";
