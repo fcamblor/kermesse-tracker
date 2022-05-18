@@ -284,7 +284,7 @@ export class KTCheckinFromExistingFamilyView extends LitElement {
       const names = this.checkinMembers.map(cm => `${toFullTextNormalized(cm.lastName).toLowerCase()}__${toFullTextNormalized(cm.firstName).toLowerCase()}`);
       const allNamesAreUnique = new Set(names).size === names.length;
 
-      this.validForm = allRowsAreFilled && allNamesAreUnique;
+      this.validForm = !!this.checkinMembers.length && allRowsAreFilled && allNamesAreUnique;
   }
 
   cancelCheckin(): void {
