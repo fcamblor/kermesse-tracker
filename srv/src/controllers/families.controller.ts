@@ -7,7 +7,7 @@ export class FamiliesController {
   constructor(private readonly appService: AppService) {}
 
   @Post("/:year")
-  async createScrapEntry(@Param("year", ParseIntPipe) year: number, @Body() families: Family[]): Promise<void> {
+  async createOrUpdateFamily(@Param("year", ParseIntPipe) year: number, @Body() families: Family[]): Promise<void> {
     await this.appService.createOrUpdateFamily(year, families);
   }
 

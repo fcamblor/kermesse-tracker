@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import {FamiliesDAO} from "../persistance/families.dao";
 import {Optional} from "@shared/utils/Optional";
+import {CheckinsDAO} from "../persistance/checkins.dao";
 
 @Injectable()
 export class AppService {
-  constructor(private readonly familiesDao: FamiliesDAO) {
+  constructor(
+      private readonly familiesDao: FamiliesDAO,
+      private readonly checkinsDao: CheckinsDAO
+  ) {
   }
 
   async createOrUpdateFamily(year: number, families: Family[]) {
@@ -19,5 +23,12 @@ export class AppService {
 
     async findFamiliesByYear(year: number): Promise<Optional<Family[]>> {
         return await this.familiesDao.findFamiliesByYear(year);
+    }
+
+    async createThenGetAllCheckins(year: number, checkins: Checkin[]) {
+      if(checkins.length) {
+          await this.checkinsDao.createOrUpdateCheckinsForYear(year, checkins);
+      }
+      return await this.checkinsDao.fetchAllCheckinsForYear(year);
     }
 }
