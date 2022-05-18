@@ -47,8 +47,8 @@ export class KTSettingsView extends LitElement {
               <label for="baseUrl" class="col-sm-8 col-form-label col-form-label-lg">Serveur</label>
               <div class="col-sm-16">
                 <select class="form-select form-select-lg" id="baseUrl" @change="${(e: InputEvent) => this.baseUrlUpdated(e)}">
-                  <option value="${PROD_URL}" .checked="${this.baseUrl===undefined || this.baseUrl===PROD_URL}">Prod</option>
-                  <option value="${LOCAL_URL}" .checked="${this.baseUrl===LOCAL_URL}">Localhost</option>
+                  <option value="${PROD_URL}" .selected="${this.baseUrl===undefined || this.baseUrl===PROD_URL}">Prod</option>
+                  <option value="${LOCAL_URL}" .selected="${this.baseUrl===LOCAL_URL}">Localhost</option>
                 </select>
               </div>
             </div>
