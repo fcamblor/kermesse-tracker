@@ -14,6 +14,10 @@ export class StatsHeading extends LitElement {
       padding: 4px 16px;
       width: 100%;
     }
+    .local {
+      font-size: 1.2rem;
+      color: var(--bs-green)
+    }
   `]
 
   @property({type: Array})
