@@ -1,4 +1,4 @@
-import {html, css, LitElement} from 'lit'
+import {html, css, LitElement, TemplateResult} from 'lit'
 import {customElement, state} from 'lit/decorators.js'
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 import {repeat} from "lit/directives/repeat.js";
@@ -23,8 +23,7 @@ type CheckinMember = {
     isPlanned: boolean;
 } & ({ isPlanned: true, present: boolean } | { isPlanned: false, present: true })
 
-@customElement('kt-checkin-from-existing-family')
-export class KTCheckinFromExistingFamilyView extends LitElement {
+abstract class AbstractKTCheckin extends LitElement {
   //language=css
   static styles = [
       CSS_Global,
@@ -36,46 +35,23 @@ export class KTCheckinFromExistingFamilyView extends LitElement {
     }
   `]
 
-    constructor(){
-      super();
-      console.log(this.attributes);
-    }
+    abstract initializeComponent(): Promise<{ adultsCount: number, nonSchoolChildrenCount: number, nonCheckedInMembers: Member[], pastCheckinMembers: Member[] }>;
+    abstract schoolChildrenSection(): TemplateResult;
+    abstract submitCheckin(): void;
 
     async connectedCallback() {
         super.connectedCallback();
 
-        const encodedMember = this.attributes.getNamedItem("encoded-member");
-        if(!encodedMember) {
-            throw new Error("Missing encoded-member attribute on kt-checkin-from-existing-family view !");
-        }
-
-        const families = await FamiliesClient.INSTANCE.fetchFamilies(new Date().getFullYear());
-        const members = familiesMembers(families);
-        const member = decodeMemberUrlParam(members, encodedMember.value);
-
-        this._family = findFamilyContaining(families, member);
-        this._pastCheckins = findPastCheckinsMatchingFamily(
-            GlobalState.INSTANCE.everyCheckins(),
-            this._family);
-
-        if(this._pastCheckins.length) {
-            const familyMembersNeverCheckedIn = findFamilyMembersNeverCheckedIn(this._family, this._pastCheckins);
-            this.adultsCount = familyMembersNeverCheckedIn.length;
-            this.nonSchoolChildrenCount = 0
-            this.pastCheckinMembers = pastCheckinMembers(this._pastCheckins);
-            this.nonCheckedInMembers = familyMembersNeverCheckedIn;
-        } else {
-            this.adultsCount = this._family.plannedCounts.adults;
-            this.nonSchoolChildrenCount = this._family.plannedCounts.nonSchoolChildren;
-            this.pastCheckinMembers = [];
-            this.nonCheckedInMembers = this._family.members;
-        }
+        const {adultsCount, nonSchoolChildrenCount, nonCheckedInMembers, pastCheckinMembers} = await this.initializeComponent();
+        this.adultsCount = adultsCount;
+        this.nonSchoolChildrenCount = nonSchoolChildrenCount;
+        this.pastCheckinMembers = pastCheckinMembers;
+        this.nonCheckedInMembers = nonCheckedInMembers;
 
         this.updateCheckinMembers(false);
     }
 
-  _family: Family|undefined = undefined;
-  _pastCheckins: Checkin[]|undefined = undefined;
+  protected _pastCheckins: Checkin[]|undefined = undefined;
 
   @state() adultsCount!: number;
   @state() nonSchoolChildrenCount!: number;
@@ -89,11 +65,7 @@ export class KTCheckinFromExistingFamilyView extends LitElement {
   render() {
     return html`
       <h4>Enfants scolarisés</h4>
-      <ul>
-        ${repeat(this._family?.schoolChildren || [], memberKey, (schoolChild: SchoolChild) => html`
-          <li><strong>${schoolChild.lastName.toUpperCase()} ${schoolChild.firstName}</strong> (${schoolChild.className})</li>
-        `)}
-      </ul>
+      ${this.schoolChildrenSection()}
       <hr class="m-2"/>
       <h4>Membres de la famille</h4>
       <div class="row row-cols-lg-auto g-3 align-items-center">
@@ -290,29 +262,78 @@ export class KTCheckinFromExistingFamilyView extends LitElement {
   cancelCheckin(): void {
       Router.navigateToHome();
   }
+}
 
-  async submitCheckin() {
-      const checkin: Checkin = {
-          creator: GlobalState.INSTANCE.settings()?.deviceName || "Inconnu",
-          isoDate: new Date().toISOString(),
-          familyLastName: this._family!.schoolChildren[0].lastName,
-          members: ([] as Member[])
-              .concat(...this.checkinMembers.filter(cm => cm.present).map(cm => ({
-                  firstName: cm.firstName,
-                  lastName: cm.lastName,
-                  isSchoolChild: false
-              }))),
-          counts: {
-              adults: this.adultsCount,
-              nonSchoolChildren: this.nonSchoolChildrenCount,
-              schoolChildren: this._family!.schoolChildren.length
-          }
-      };
+@customElement('kt-checkin-from-existing-family')
+export class KTCheckinFromExistingFamilyView extends AbstractKTCheckin {
+    protected _family: Family|undefined = undefined;
 
-      await GlobalState.INSTANCE.addLocalCheckin(checkin);
+    async initializeComponent(): Promise<{ adultsCount: number; nonSchoolChildrenCount: number; nonCheckedInMembers: Member[]; pastCheckinMembers: Member[] }> {
+        const encodedMember = this.attributes.getNamedItem("encoded-member");
+        if(!encodedMember) {
+            throw new Error("Missing encoded-member attribute on kt-checkin-from-existing-family view !");
+        }
 
-      Router.navigateToHome();
-  }
+        const families = await FamiliesClient.INSTANCE.fetchFamilies(new Date().getFullYear());
+        const members = familiesMembers(families);
+        const member = decodeMemberUrlParam(members, encodedMember.value);
+
+        this._family = findFamilyContaining(families, member);
+        this._pastCheckins = findPastCheckinsMatchingFamily(
+            GlobalState.INSTANCE.everyCheckins(),
+            this._family);
+
+        const family = this._family!;
+        if(this._pastCheckins?.length) {
+            const familyMembersNeverCheckedIn = findFamilyMembersNeverCheckedIn(family, this._pastCheckins);
+            return {
+                adultsCount: familyMembersNeverCheckedIn.length,
+                nonSchoolChildrenCount: 0,
+                pastCheckinMembers: pastCheckinMembers(this._pastCheckins),
+                nonCheckedInMembers: familyMembersNeverCheckedIn,
+            };
+        } else {
+            return {
+                adultsCount: family.plannedCounts.adults,
+                nonSchoolChildrenCount: family.plannedCounts.nonSchoolChildren,
+                pastCheckinMembers: [],
+                nonCheckedInMembers: family.members,
+            };
+        }
+    }
+
+    schoolChildrenSection() {
+        return html`
+          <ul>
+            ${repeat(this._family?.schoolChildren || [], memberKey, (schoolChild: SchoolChild) => html`
+              <li><strong>${schoolChild.lastName.toUpperCase()} ${schoolChild.firstName}</strong> (${schoolChild.className})</li>
+            `)}
+          </ul>
+        `
+    }
+
+    async submitCheckin() {
+        const checkin: Checkin = {
+            creator: GlobalState.INSTANCE.settings()?.deviceName || "Inconnu",
+            isoDate: new Date().toISOString(),
+            familyLastName: this._family!.schoolChildren[0].lastName,
+            members: ([] as Member[])
+                .concat(...this.checkinMembers.filter(cm => cm.present).map(cm => ({
+                    firstName: cm.firstName,
+                    lastName: cm.lastName,
+                    isSchoolChild: false
+                }))),
+            counts: {
+                adults: this.adultsCount,
+                nonSchoolChildren: this.nonSchoolChildrenCount,
+                schoolChildren: this._family!.schoolChildren.length
+            }
+        };
+
+        await GlobalState.INSTANCE.addLocalCheckin(checkin);
+
+        Router.navigateToHome();
+    }
 }
 
 declare global {
