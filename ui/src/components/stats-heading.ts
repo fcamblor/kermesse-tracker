@@ -28,7 +28,7 @@ export class StatsHeading extends LitElement {
       ${this.localCheckins.length?html`<span class="local">+${totalCountOf(this.localCheckins, "adults")}</span>`:html``}
 
       | Enfants: ${totalCountOf(this.checkins, "nonSchoolChildren")}
-      ${this.localCheckins.length?html`<span class="local">+${totalCountOf(this.checkins, "nonSchoolChildren")}</span>`:html``}
+      ${this.localCheckins.length?html`<span class="local">+${totalCountOf(this.localCheckins, "nonSchoolChildren")}</span>`:html``}
     `
   }
 }
