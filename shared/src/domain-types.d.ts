@@ -24,6 +24,7 @@ declare type Family = {
 }
 
 declare type Checkin = {
+    creator: string;
     isoDate: string;
     members: Member[];
     familyLastName?: string;

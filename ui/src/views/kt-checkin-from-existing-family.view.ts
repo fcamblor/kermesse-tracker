@@ -163,7 +163,7 @@ export class KTCheckinFromExistingFamilyView extends LitElement {
       <h4>Checkins précédents</h4>
         <ul>
           ${repeat(this._pastCheckins, pc => `${pc.isoDate}_${pc.familyLastName}`, pc => html`
-          <li>@${formatTime(pc.isoDate)} - ${pc.counts.adults} Adu + ${pc.counts.nonSchoolChildren} Enf</li>
+          <li>@${formatTime(pc.isoDate)} (${pc.creator}) - ${pc.counts.adults} Adu + ${pc.counts.nonSchoolChildren} Enf</li>
           `)}
         </ul>
         <table class="table table-sm">
@@ -291,6 +291,7 @@ export class KTCheckinFromExistingFamilyView extends LitElement {
 
   async submitCheckin() {
       const checkin: Checkin = {
+          creator: GlobalState.INSTANCE.settings()?.deviceName || "Inconnu",
           isoDate: new Date().toISOString(),
           familyLastName: this._family!.schoolChildren[0].lastName,
           members: ([] as Member[])
