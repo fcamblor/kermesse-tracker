@@ -6,10 +6,10 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "build": "cd shared && npm ci && npm run build && cd ../ui && npm ci && npm run build && cd ../srv && npm ci && npm run build"
-  },
-  "dependencies": {
+    "build": "cd shared && npm ci && npm run build && cd ../ui && npm ci && npm run build && cd ../srv && npm ci && npm run build",
+    "dev": "concurrently --kill-others \"cd shared && npm run dev\" \"cd ui && npm run dev\" \"cd srv && npm run start:debug\""
   },
   "devDependencies": {
+    "concurrently": "7.2.0"
   }
 }
