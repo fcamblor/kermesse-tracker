@@ -65,6 +65,7 @@ export class KTHomeView extends LitElement {
         .members="${this.families.flatMap(familyMembers)}"
         @on-member-selected="${(e: CustomEvent<MemberSelected>) => this.showFamilyCheckin(e.detail.member)}"
     ></people-selector>
+    <button type="button" class="btn btn-primary mx-2" @click="${() => Router.navigateToSettingsPage()}">Configuration</button>
         `
     }
 
