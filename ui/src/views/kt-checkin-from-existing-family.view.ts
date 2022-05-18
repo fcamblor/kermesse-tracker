@@ -54,7 +54,9 @@ export class KTCheckinFromExistingFamilyView extends LitElement {
         const member = decodeMemberUrlParam(members, encodedMember.value);
 
         this._family = findFamilyContaining(families, member);
-        this._pastCheckins = findPastCheckinsMatchingFamily(GlobalState.INSTANCE.localCheckins(), this._family);
+        this._pastCheckins = findPastCheckinsMatchingFamily(
+            GlobalState.INSTANCE.everyCheckins(),
+            this._family);
 
         if(this._pastCheckins.length) {
             const familyMembersNeverCheckedIn = findFamilyMembersNeverCheckedIn(this._family, this._pastCheckins);

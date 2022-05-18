@@ -25,8 +25,10 @@ export class KTHomeView extends LitElement {
     @state()
     families: Family[] = []
 
-    @state()
-    localCheckins: Checkin[] = []
+    @state() checkins: Checkin[] = GlobalState.INSTANCE.checkins()
+    @state() localCheckins: Checkin[] = GlobalState.INSTANCE.localCheckins()
+
+    private listenerCleaners: Array<Function> = [];
 
     constructor() {
         super();
@@ -35,13 +37,29 @@ export class KTHomeView extends LitElement {
             .then(families => {
                 this.families = families;
             })
+    }
 
-        this.localCheckins = GlobalState.INSTANCE.localCheckins();
+
+    connectedCallback() {
+        super.connectedCallback();
+
+        this.listenerCleaners.push(GlobalState.INSTANCE.subscribe("change:checkins", (checkins) => {
+            this.checkins = checkins;
+        }));
+        this.listenerCleaners.push(GlobalState.INSTANCE.subscribe("change:localCheckins", (localCheckins) => {
+            this.localCheckins = localCheckins;
+        }));
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+
+        this.listenerCleaners.forEach(listener => listener());
     }
 
     render() {
         return html`
-    <stats-heading .checkins="${this.localCheckins}"></stats-heading>
+    <stats-heading .checkins="${this.checkins}" .localCheckins="${this.localCheckins}"></stats-heading>
     <hr class="m-2">
     <people-selector
         .members="${this.families.flatMap(familyMembers)}"

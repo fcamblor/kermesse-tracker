@@ -43,6 +43,7 @@ export class ClientDatasource {
             method: opts.method,
             headers: {
                 ...opts.headers,
+                'Content-Type': 'application/json',
                 'Authorization': this.config.authToken,
             },
             body: (opts.method==='PUT'||opts.method==='POST')?JSON.stringify(opts.data):undefined,

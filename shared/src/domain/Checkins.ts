@@ -14,3 +14,7 @@ export function findFamilyMembersNeverCheckedIn(family: Family, pastCheckins: Ch
 export function pastCheckinMembers(pastCheckins: Checkin[]): Member[] {
     return pastCheckins.flatMap(pc => pc.members);
 }
+
+export function totalCountOf(checkins: Checkin[], field: "adults"|"nonSchoolChildren") {
+    return checkins.reduce((total, checkin) => total + checkin.counts[field], 0);
+}

@@ -1,5 +1,6 @@
 import { html, css, LitElement } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
+import { totalCountOf } from '@shared/domain/Checkins';
 import {CSS_Global} from "../styles/ConstructibleStyleSheets";
 
 @customElement('stats-heading')
@@ -18,10 +19,16 @@ export class StatsHeading extends LitElement {
   @property({type: Array})
   checkins: Checkin[] = []
 
+  @property({type: Array})
+  localCheckins: Checkin[] = []
+
   render() {
     return html`
-      Adultes: ${this.checkins.reduce((total, checkin) => total + checkin.counts.adults, 0)}
-      | Enfants: ${this.checkins.reduce((total, checkin) => total + checkin.counts.nonSchoolChildren, 0)}
+      Adultes: ${totalCountOf(this.checkins, "adults")}
+      ${this.localCheckins.length?html`<span class="local">+${totalCountOf(this.localCheckins, "adults")}</span>`:html``}
+
+      | Enfants: ${totalCountOf(this.checkins, "nonSchoolChildren")}
+      ${this.localCheckins.length?html`<span class="local">+${totalCountOf(this.checkins, "nonSchoolChildren")}</span>`:html``}
     `
   }
 }

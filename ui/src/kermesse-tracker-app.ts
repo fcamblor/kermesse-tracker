@@ -19,6 +19,8 @@ export class KermesseTrackerApp extends LitElement {
 
   @state() viewTemplateResult: SlottedTemplateResultFactory|undefined = undefined;
 
+  private checkinBackgroundSyncIntervalId: number|undefined = undefined;
+
   constructor() {
     super();
 
@@ -28,6 +30,7 @@ export class KermesseTrackerApp extends LitElement {
                 baseUrl: settings.baseUrl,
                 authToken: settings.authToken
             })
+            this.synchronizeCheckins();
         }
     })
 
@@ -41,6 +44,16 @@ export class KermesseTrackerApp extends LitElement {
               Router.navigateToSettingsPage();
           }
         })
+
+    this.checkinBackgroundSyncIntervalId = setInterval(async () => {
+        this.synchronizeCheckins();
+    }, 60000)
+  }
+
+  private async synchronizeCheckins() {
+      if(ClientDatasource.INSTANCE.isConfigured()) {
+          await GlobalState.INSTANCE.synchronizeCheckins();
+      }
   }
 
   render() {
@@ -49,6 +62,11 @@ export class KermesseTrackerApp extends LitElement {
         <!-- slots here -->
       `):html``}
     `
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    clearInterval(this.checkinBackgroundSyncIntervalId);
   }
 }
 
