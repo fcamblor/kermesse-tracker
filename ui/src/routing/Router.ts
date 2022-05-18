@@ -41,7 +41,7 @@ class Routing {
             viewContent: async () => (subViewSlot) => html`<kt-home>${subViewSlot}</kt-home>`
         });
         this.declareRoutes('/checkin-from-existing-family/:encodedMember', {
-            doFirst: async () => import('../views/kt-checkin-from-existing-family.view'),
+            doFirst: async () => import('../views/kt-checkin.view'),
             viewContent: async (pathParams) => (subViewSlot) => html`
               <kt-checkin-from-existing-family encoded-member="${pathParams['encodedMember']}">
                 ${subViewSlot}
