@@ -33,6 +33,8 @@ abstract class AbstractKTCheckin extends LitElement {
       padding: 4px 0px;
       width: 100%;
     }
+    @media (max-width: 420px) { .name-col { width: 100%; } }
+    @media (min-width: 420px) { .name-col { width: 50%; float: left; } }
   `]
 
     abstract initializeComponent(): Promise<{ adultsCount: number, nonSchoolChildrenCount: number, nonCheckedInMembers: Member[], pastCheckinMembers: Member[] }>;
@@ -91,23 +93,27 @@ abstract class AbstractKTCheckin extends LitElement {
       <table class="table table-sm table-borderless">
         <thead>
           <tr>
-            <th scope="col" class="col-10">Nom</th>
-            <th scope="col" class="col-10">Prénom</th>
+            <th scope="col" class="col-20">
+              <div class="name-col">Nom</div>
+              <div class="name-col">Prénom</div>
+            </th>
             <th scope="col" class="col-4">Présence</th>
           </tr>
         </thead>
         <tbody>
         ${repeat(this.checkinMembers, cm => cm.idx, (cm: CheckinMember) => html`
-          <tr>
-            <td class="col-10">
-              <input type="text" class="w-100" name="lastName${cm.idx}" 
-                     .value="${cm.lastName}"
-                     @change="${this.lastNameUpdatedFor(cm)}">
-            </td>
-            <td class="col-10">
-              <input type="text" class="w-100" name="firstName${cm.idx}"
-                     .value="${cm.firstName}"
-                     @change="${this.firstNameUpdatedFor(cm)}">
+          <tr style="border: 2px solid grey">
+            <td class="col-20">
+              <div class="name-col">
+                <input type="text" class="w-100" name="lastName${cm.idx}"
+                       .value="${cm.lastName}"
+                       @change="${this.lastNameUpdatedFor(cm)}">
+              </div>
+              <div class="name-col">
+                <input type="text" class="w-100" name="firstName${cm.idx}"
+                       .value="${cm.firstName}"
+                       @change="${this.firstNameUpdatedFor(cm)}">
+              </div>
             </td>
             <td class="col-4">
               ${cm.isPlanned?html`
