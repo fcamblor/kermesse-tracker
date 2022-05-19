@@ -33,7 +33,7 @@ export class KTHomeView extends LitElement {
     constructor() {
         super();
 
-        FamiliesClient.INSTANCE.fetchFamilies(new Date().getFullYear())
+        FamiliesClient.INSTANCE.fetchComputedFamilies(new Date().getFullYear())
             .then(families => {
                 this.families = families;
             })

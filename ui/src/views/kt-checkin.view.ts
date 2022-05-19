@@ -274,7 +274,7 @@ export class KTCheckinFromExistingFamilyView extends AbstractKTCheckin {
             throw new Error("Missing encoded-member attribute on kt-checkin-from-existing-family view !");
         }
 
-        const families = await FamiliesClient.INSTANCE.fetchFamilies(new Date().getFullYear());
+        const families = await FamiliesClient.INSTANCE.fetchComputedFamilies(new Date().getFullYear());
         const members = familiesMembers(families);
         const member = decodeMemberUrlParam(members, encodedMember.value);
 
