@@ -1,6 +1,7 @@
 import {membersMatch} from "./Members";
+import {Optional} from "../utils/Optional";
 
-export function findFamilyContaining(families: Family[], member: Member): Family {
+export function findFamilyContaining(families: Family[], member: Member): Optional<Family> {
     const matchingFamily = families.find(family => {
         const members = familyMembers(family);
         return members.reduce((memberFound, candidate) => {
@@ -9,10 +10,11 @@ export function findFamilyContaining(families: Family[], member: Member): Family
     })
 
     if(matchingFamily) {
-        return matchingFamily;
+        return Optional.of(matchingFamily);
     }
 
-    throw new Error(`Family matching ${JSON.stringify(member)} not found !`);
+    // console.error(`Family matching ${JSON.stringify(member)} not found !`);
+    return Optional.absent();
 }
 
 export function familyMembers(family: Family): Member[] {

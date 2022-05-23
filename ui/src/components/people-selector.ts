@@ -7,6 +7,7 @@ import peopleSelectorCss from "./people-selector.scss";
 import { toFullTextNormalized } from '@shared/utils/Text';
 import {memberKey} from "@shared/domain/Members";
 import {SVG_CLOSE_ICON} from "../services/SVGs";
+import {findFamilyContaining} from "@shared/domain/Families";
 
 export type MemberSelected = { member: Member };
 
@@ -23,6 +24,8 @@ export class PeopleSelector extends LitElement {
       width: 100%;
     }
   `]
+
+  @property() families!: Family[];
 
   @property({type: Object})
   set value (m: Member | undefined) {
@@ -49,9 +52,6 @@ export class PeopleSelector extends LitElement {
 
 
   render() {
-    // const content = html`
-    //   <input type="text" name="members" />
-    // `
     return html`
           <form class="row align-items-center"
                 @submit="${this.handleSubmit}">
@@ -199,6 +199,7 @@ export class PeopleSelector extends LitElement {
     }
 
     private renderMemberItem(member: Member, index: number) {
+        const maybeFamily = findFamilyContaining(this.families, member)
         return html`
           <li
               class="autocomplete-result"
@@ -206,7 +207,10 @@ export class PeopleSelector extends LitElement {
               aria-selected="${index === 0}"
               @click="${() => this.memberSelected(member)}"
           >
-            <span class="member">${memberKey(member)}</span>
+            <span class="member">${memberKey(member)} ${maybeFamily.map(f =>
+                (f.plannedCounts.adults+f.plannedCounts.nonSchoolChildren > 0) ? html`- ${f.plannedCounts.adults} Adu, ${f.plannedCounts.nonSchoolChildren} Enf`:html``
+            ).orElse(html``)}
+            </span>
           </li>`
     }
 }

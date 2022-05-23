@@ -284,10 +284,12 @@ export class KTCheckinFromExistingFamilyView extends AbstractKTCheckin {
         const members = familiesMembers(families);
         const member = decodeMemberUrlParam(members, encodedMember.value);
 
-        this._family = findFamilyContaining(families, member);
-        this._pastCheckins = findPastCheckinsMatchingFamily(
-            GlobalState.INSTANCE.everyCheckins(),
-            this._family);
+        findFamilyContaining(families, member).map(family => {
+            this._family = family;
+            this._pastCheckins = findPastCheckinsMatchingFamily(
+                GlobalState.INSTANCE.everyCheckins(),
+                this._family);
+        });
 
         const family = this._family!;
         if(this._pastCheckins?.length) {
