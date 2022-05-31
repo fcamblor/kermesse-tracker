@@ -60,6 +60,7 @@ abstract class AbstractKTCheckin extends LitElement {
   @state() nonCheckedInMembers!: Member[];
   @state() pastCheckinMembers!: Member[];
   @state() checkinMembers: CheckinMember[] = [];
+  @state() showPreviousCheckins: boolean = false;
   get plannedCheckinMembers(): CheckinMember[] { return this.checkinMembers.filter(cm => cm.isPlanned); }
   get plannedPresentCheckinMembers(): CheckinMember[] { return this.checkinMembers.filter(cm => cm.isPlanned && cm.present); }
   @state() validForm: boolean = false;
@@ -134,11 +135,18 @@ abstract class AbstractKTCheckin extends LitElement {
         </tbody>
       </table>
       <div class="ps-2">
-        <button type="button" class="btn btn-lg btn-primary" @click=${() => this.submitCheckin()} .disabled="${!this.validForm}">Valider</button>
-        <button type="button" class="btn btn-lg btn-warning" @click="${() => this.cancelCheckin()}">Retour</button>
+        <button type="button" class="my-2 btn btn-lg btn-primary" @click=${() => this.submitCheckin()} .disabled="${!this.validForm}">Valider</button>
+        <button type="button" class="my-2 btn btn-lg btn-warning" @click="${() => this.cancelCheckin()}">Retour</button>
+        ${this._pastCheckins?.length?html`
+          ${this.showPreviousCheckins?html`
+          <button type="button" class="my-2 btn btn-lg btn-info" @click="${() => this.showPreviousCheckins = false}">Masquer les checkins précédents</button>
+          `:html`
+          <button type="button" class="my-2 btn btn-lg btn-info" @click="${() => this.showPreviousCheckins = true}">Afficher les checkins précédents</button>
+          `}
+        `:html``}
       </div>
       
-      ${this._pastCheckins?.length?html`
+      ${(this._pastCheckins?.length && this.showPreviousCheckins)?html`
       <hr class="m-2"/>
       <h4>Checkins précédents</h4>
         <ul>
