@@ -42,10 +42,10 @@ export class KTHomeView extends LitElement {
     connectedCallback() {
         super.connectedCallback();
 
-        this.listenerCleaners.push(GlobalState.INSTANCE.subscribe("change:checkins", (checkins) => {
+        this.listenerCleaners.push(GlobalState.INSTANCE.subscribe("change:checkins", async (checkins) => {
             this.checkins = checkins;
         }));
-        this.listenerCleaners.push(GlobalState.INSTANCE.subscribe("change:localCheckins", (localCheckins) => {
+        this.listenerCleaners.push(GlobalState.INSTANCE.subscribe("change:localCheckins", async (localCheckins) => {
             this.localCheckins = localCheckins;
         }));
     }

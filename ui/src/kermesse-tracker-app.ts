@@ -24,13 +24,13 @@ export class KermesseTrackerApp extends LitElement {
   constructor() {
     super();
 
-    GlobalState.INSTANCE.subscribe("change:settings", (settings) => {
+    GlobalState.INSTANCE.subscribe("change:settings", async (settings) => {
         if(settings) {
             ClientDatasource.INSTANCE.use({
                 baseUrl: settings.baseUrl,
                 authToken: settings.authToken
             })
-            this.synchronizeCheckins();
+            await this.synchronizeCheckins();
         }
     })
 

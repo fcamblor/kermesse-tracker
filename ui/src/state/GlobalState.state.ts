@@ -9,7 +9,7 @@ type StateEventTypes = {
 };
 
 export type StateEvent = keyof StateEventTypes;
-export type StateEventHandler<T extends StateEvent> = (context: StateEventTypes[T]) => void;
+export type StateEventHandler<T extends StateEvent> = (context: StateEventTypes[T]) => Promise<void>;
 
 type StateEventsListeners = {
     [eventType in StateEvent]: Array<StateEventHandler<eventType>>
@@ -41,7 +41,9 @@ export class GlobalState {
     }
 
     private triggerEvent<E extends StateEvent>(event: E, context: StateEventTypes[E]) {
-        this._listeners[event].forEach(callback => callback(context));
+        return Promise.all(
+            this._listeners[event].map(callback => callback(context))
+        );
     }
 
     public async init() {
@@ -65,7 +67,7 @@ export class GlobalState {
     public async addLocalCheckin(checkin: Checkin) {
         this._localCheckins.push(checkin);
         await PersistedLocalCheckins.store(this._localCheckins);
-        this.triggerEvent("change:localCheckins", this._localCheckins)
+        await this.triggerEvent("change:localCheckins", this._localCheckins)
     }
 
     public async updateSettings(settings: Settings|undefined, skipStoring: boolean = false) {
@@ -77,14 +79,19 @@ export class GlobalState {
             }
         }
         this._settings = settings;
-        this.triggerEvent("change:settings", this._settings?deepCloneObjectLiteral(this._settings):undefined);
+        await this.triggerEvent("change:settings", this._settings?deepCloneObjectLiteral(this._settings):undefined);
     }
 
     public async synchronizeCheckins() {
-        this._checkins = await CheckinsClient.INSTANCE.synchronizeCheckins(new Date().getFullYear(), this._localCheckins)
-        this.triggerEvent("change:checkins", this._checkins)
-
-        this._localCheckins = [];
-        this.triggerEvent("change:localCheckins", this._localCheckins)
+        await Promise.all([
+            (async () => {
+                this._checkins = await CheckinsClient.INSTANCE.synchronizeCheckins(new Date().getFullYear(), this._localCheckins)
+                await this.triggerEvent("change:checkins", this._checkins)
+            })(),
+            (async () => {
+                this._localCheckins = [];
+                await this.triggerEvent("change:localCheckins", this._localCheckins)
+            })()
+        ])
     }
 }
