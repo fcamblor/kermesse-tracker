@@ -47,15 +47,17 @@ export class GlobalState {
     }
 
     public async init() {
-        return Promise.all([
-            PersistedLocalCheckins.load().then(checkins => {
-                this._localCheckins = checkins
-            }),
-            PersistedSettings.load().then(settings => {
+        return await Promise.all([
+            (async () => {
+                this._localCheckins = await PersistedLocalCheckins.load();
+                this.subscribe("change:localCheckins", async () => await PersistedLocalCheckins.store(this._localCheckins) )
+            })(),
+            (async () => {
+                const settings = await PersistedSettings.load();
                 if(settings !== this._settings) {
-                    this.updateSettings(settings);
+                    await this.updateSettings(settings);
                 }
-            })
+            })()
         ])
     }
 
@@ -66,7 +68,6 @@ export class GlobalState {
 
     public async addLocalCheckin(checkin: Checkin) {
         this._localCheckins.push(checkin);
-        await PersistedLocalCheckins.store(this._localCheckins);
         await this.triggerEvent("change:localCheckins", this._localCheckins)
     }
 
