@@ -1,4 +1,4 @@
-import {PersistedCheckins, PersistedSettings} from "../persistance/LocalstoragePersistor";
+import {PersistedLocalCheckins, PersistedSettings} from "../persistance/LocalstoragePersistor";
 import {deepCloneObjectLiteral} from "@shared/utils/ObjectLiterals";
 import {CheckinsClient} from "../clients/CheckinsClient";
 
@@ -46,7 +46,7 @@ export class GlobalState {
 
     public async init() {
         return Promise.all([
-            PersistedCheckins.load().then(checkins => {
+            PersistedLocalCheckins.load().then(checkins => {
                 this._localCheckins = checkins
             }),
             PersistedSettings.load().then(settings => {
@@ -64,7 +64,7 @@ export class GlobalState {
 
     public async addLocalCheckin(checkin: Checkin) {
         this._localCheckins.push(checkin);
-        await PersistedCheckins.store(this._localCheckins);
+        await PersistedLocalCheckins.store(this._localCheckins);
         this.triggerEvent("change:localCheckins", this._localCheckins)
     }
 
