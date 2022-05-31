@@ -56,7 +56,7 @@ export class PeopleSelector extends LitElement {
           <form class="row align-items-center"
                 @submit="${this.handleSubmit}">
             <label for="membersSearch">
-                Recherche:
+                <h4>Recherche</h4>
             </label>
             <div class="px-0 col autocomplete ${classMap({'_open': this.showDropdown, '_withButton': this.filter !== ''})}">
                 <input type="search" class="autocomplete-input"

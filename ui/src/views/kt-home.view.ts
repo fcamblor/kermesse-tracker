@@ -60,13 +60,14 @@ export class KTHomeView extends LitElement {
     render() {
         return html`
     <stats-heading .checkins="${this.checkins}" .localCheckins="${this.localCheckins}"></stats-heading>
-    <hr class="m-2">
-    <people-selector
-        .members="${this.families.flatMap(familyMembers)}"
-        .families="${this.families}"
-        @on-member-selected="${(e: CustomEvent<MemberSelected>) => this.showFamilyCheckin(e.detail.member)}"
-    ></people-selector>
-    <button type="button" class="btn btn-primary mx-2" @click="${() => Router.navigateToSettingsPage()}">Configuration</button>
+    <div style="background-color: #F8F4F9">
+      <people-selector
+          .members="${this.families.flatMap(familyMembers)}"
+          .families="${this.families}"
+          @on-member-selected="${(e: CustomEvent<MemberSelected>) => this.showFamilyCheckin(e.detail.member)}"
+      ></people-selector>
+      <button type="button" class="my-2 btn btn-primary mx-2" @click="${() => Router.navigateToSettingsPage()}">Configuration</button>
+    </div>
         `
     }
 
