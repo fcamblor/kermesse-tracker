@@ -70,7 +70,7 @@ abstract class AbstractKTCheckin extends LitElement {
       ${this.schoolChildrenSection()}
       <hr class="m-2"/>
       <h4>Membres de la famille</h4>
-      <div class="row row-cols-lg-auto g-3 align-items-center">
+      <div class="row g-3 align-items-center">
         <div class="col-12">
           <label class="visually-hidden" for="adultsCount">Adults count</label>
           <div class="input-group">
