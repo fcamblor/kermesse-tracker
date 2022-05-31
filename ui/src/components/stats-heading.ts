@@ -36,6 +36,7 @@ export class StatsHeading extends LitElement {
 
       | Enfants: ${totalCountOf(this.checkins, "nonSchoolChildren")}
       ${this.localCheckins.length?html`<span class="local">+${totalCountOf(this.localCheckins, "nonSchoolChildren")}</span>`:html``}
+      <button type="button" class="btn btn-primary" @click="${() => this.dispatchEvent(new Event("refreshRequested"))}">🔄</button>
       </h4>
     `
   }

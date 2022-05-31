@@ -32,13 +32,12 @@ export class KTHomeView extends LitElement {
 
     constructor() {
         super();
-
-        FamiliesClient.INSTANCE.fetchComputedFamilies(new Date().getFullYear())
-            .then(families => {
-                this.families = families;
-            })
+        this.fetchFamilies();
     }
 
+    private async fetchFamilies() {
+        this.families = await FamiliesClient.INSTANCE.fetchComputedFamilies(new Date().getFullYear());
+    }
 
     connectedCallback() {
         super.connectedCallback();
@@ -59,7 +58,10 @@ export class KTHomeView extends LitElement {
 
     render() {
         return html`
-    <stats-heading .checkins="${this.checkins}" .localCheckins="${this.localCheckins}"></stats-heading>
+    <stats-heading 
+        .checkins="${this.checkins}" .localCheckins="${this.localCheckins}"
+        @refreshRequested="${() => GlobalState.INSTANCE.synchronizeCheckins()}"
+    ></stats-heading>
     <div style="background-color: #F8F4F9">
       <people-selector
           .members="${this.families.flatMap(familyMembers)}"
