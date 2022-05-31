@@ -119,18 +119,19 @@ abstract class AbstractKTCheckin extends LitElement {
                 </div>
               </td>
               <td class="col-4">
-                ${cm.isPlanned?html`
                 <div class="btn-group" role="group" aria-label="Présence">
                   <input type="radio" class="btn-check" name="presence${cm.idx}" 
                          id="present${cm.idx}" autocomplete="off" .checked="${cm.present}"
                          @change="${this.presenceUpdatedFor(cm)}">
                   <label class="btn btn-outline-primary" for="present${cm.idx}">Pré</label>
   
+                  ${cm.isPlanned?html`
                   <input type="radio" class="btn-check" name="presence${cm.idx}" 
                          id="absent${cm.idx}" autocomplete="off" .checked="${!cm.present}"
                          @change="${this.absenceUpdatedFor(cm)}">
                   <label class="btn btn-outline-secondary" for="absent${cm.idx}">Abs</label>
-                </div>`:html`&nbsp;`}
+                  `:html``}
+                </div>
               </td>
             </tr>
           `)}
