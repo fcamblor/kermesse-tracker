@@ -53,7 +53,7 @@ export class KTHomeView extends LitElement {
     disconnectedCallback() {
         super.disconnectedCallback();
 
-        this.listenerCleaners.forEach(listener => listener());
+        this.listenerCleaners.forEach(cleaner => cleaner());
     }
 
     render() {
