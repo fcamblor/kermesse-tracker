@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import {Db} from "./db";
+import {Db, kyselyDb} from "./db";
 
 @Injectable()
 export class CheckinsDAO {
-    constructor(private readonly db: Db) {
+    constructor() {
     }
 
     async createOrUpdateCheckinsForYear(year: number, checkins: Checkin[]) {
@@ -12,34 +12,28 @@ export class CheckinsDAO {
                 const {creator, isoDate, ...otherCheckinFields} = checkin
 
                 const uuid = Db.newUUID();
-                await this.db.query(`
-                INSERT INTO checkins(id, inserted_at, recorded_at, recorded_by, year, content)
-                VALUES($1, $2, $3, $4, $5, $6)
-                ON CONFLICT ON CONSTRAINT checkins_recorded_at_recorded_by_key
-                DO NOTHING
-            `, ...[
-                    uuid, new Date(), isoDate, creator, year, JSON.stringify(otherCheckinFields)
-                ]);
+
+                await kyselyDb.insertInto("checkins").values({
+                    id: uuid,
+                    inserted_at: new Date(),
+                    recorded_at: isoDate,
+                    recorded_by: creator,
+                    year,
+                    content: JSON.stringify(otherCheckinFields)
+                }).onConflict(oc => oc.constraint("checkins_recorded_at_recorded_by_key").doNothing())
+                .executeTakeFirstOrThrow()
             })
         )
     }
 
     async fetchAllCheckinsForYear(year: number): Promise<Checkin[]> {
-        return (await this.db.query(`
-          SELECT 
-              recorded_by as creator,
-              recorded_at as isodate,
-              content as content
-          FROM checkins WHERE year = $1
-        `, ...[
-            year
-        ])).rows.map(row => {
-            const content = row['content'] as Omit<Checkin, "creator"|"isoDate">;
-            return {
-                creator: row['creator'],
-                isoDate: row['isodate'],
-                ...content
-            };
-        })
+        return (await kyselyDb.selectFrom("checkins")
+            .select(["recorded_by as creator", "recorded_at as isodate", "content"])
+            .where("year", "=", year)
+            .execute()).map(row => ({
+                creator: row.creator as string,
+                isoDate: row.isodate as string,
+                ...(row.content as Omit<Checkin, "creator"|"isoDate">)
+            }))
     }
 }

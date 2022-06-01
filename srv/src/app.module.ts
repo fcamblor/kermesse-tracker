@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import {Db} from "./persistance/db";
 import {FamiliesDAO} from "./persistance/families.dao";
 import {FamiliesController} from "./controllers/families.controller";
 import {AppService} from "./services/app.service";
@@ -14,7 +13,7 @@ import {SchoolChildrenController} from "./controllers/schoolchildren.controller"
   controllers: [FamiliesController, SchoolChildrenController, AuthController, CheckinsController],
   providers: [
       AppService,
-      Db, FamiliesDAO, SchoolChildrenDAO, CheckinsDAO
+      FamiliesDAO, SchoolChildrenDAO, CheckinsDAO
   ],
 })
 export class AppModule {}

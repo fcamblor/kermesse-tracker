@@ -1,45 +1,41 @@
 import { Injectable } from '@nestjs/common';
-import {Db} from "./db";
+import {Db, kyselyDb} from "./db";
 import {Optional} from "@shared/utils/Optional";
 
 @Injectable()
 export class FamiliesDAO {
-    constructor(private readonly db: Db) {
+    constructor() {
     }
 
     async countYearCount(year: number): Promise<number> {
-        return (await this.db.query(`
-          SELECT count(*) as count FROM families WHERE year = $1
-        `, ...[
-            year
-        ])).rows.map(row =>
-            Number(row['count'])
-        )[0];
+        return Number((
+            await kyselyDb.selectFrom('families')
+                .select(kyselyDb.fn.count<string>("id").as("cpt"))
+                .where("year", "=", year)
+                .executeTakeFirst()
+        ).cpt);
     }
 
     async createFamiliesEntry(year: number, families: Family[]) {
         const uuid = Db.newUUID();
-        await this.db.query(`
-            INSERT INTO families (id, year, content)
-            VALUES ($1, $2, $3)
-        `, ...[
-            uuid, year, JSON.stringify(families)
-        ])
+        await kyselyDb.insertInto('families').values({
+            id: uuid,
+            year,
+            content: JSON.stringify(families)
+        }).executeTakeFirstOrThrow()
     }
 
     async updateFamiliesEntry(year: number, families: Family[]) {
-        await this.db.query(`
-                UPDATE families SET content = $1 WHERE year = $2
-            `, ...[
-            JSON.stringify(families), year
-        ])
+        await kyselyDb.updateTable('families')
+            .where("year", "=", year)
+            .set({ content: JSON.stringify(families) })
+            .execute()
     }
 
     async findFamiliesByYear(year: number): Promise<Optional<Family[]>> {
-        return Optional.fromNullable((await this.db.query(`
-            SELECT content FROM families WHERE year = $1
-        `, ...[ year ])).rows.map(row =>
-            row["content"] as Family[]
-        )[0])
+        return Optional.fromNullable((await kyselyDb.selectFrom('families')
+            .select('content')
+            .where('year', '=', year)
+            .executeTakeFirst())?.content as Family[]);
     }
 }
