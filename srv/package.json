@@ -47,7 +47,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "28.0.3",
-    "kysely-codegen": "0.2.4",
+    "kysely-codegen": "https://github.com/fcamblor/kysely-codegen.git#fix-for-pg-timestamps",
     "prettier": "^2.3.2",
     "source-map-support": "^0.5.20",
     "supertest": "^6.1.3",
@@ -75,6 +75,6 @@
     "testEnvironment": "node"
   },
   "engines": {
-    "node" : ">=16.0.0"
+    "node": ">=16.0.0"
   }
 }

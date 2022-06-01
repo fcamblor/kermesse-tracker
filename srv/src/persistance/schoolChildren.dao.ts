@@ -1,45 +1,43 @@
 import { Injectable } from '@nestjs/common';
-import {Db} from "./db";
+import {Db, kyselyDb} from "./db";
 import {Optional} from "@shared/utils/Optional";
 
 @Injectable()
 export class SchoolChildrenDAO {
-    constructor(private readonly db: Db) {
+    constructor() {
     }
 
     async countYearCount(year: number): Promise<number> {
-        return (await this.db.query(`
-          SELECT count(*) as count FROM school_children WHERE year = $1
-        `, ...[
-            year
-        ])).rows.map(row =>
-            Number(row['count'])
-        )[0];
+        return Number((await kyselyDb.selectFrom("school_children")
+            .select(kyselyDb.fn.count("id").as("count"))
+            .where("year", "=", year)
+            .executeTakeFirst()).count)
     }
 
     async createSchoolChildrenEntry(year: number, schoolChildren: SchoolChild[]) {
         const uuid = Db.newUUID();
-        await this.db.query(`
-            INSERT INTO school_children (id, year, content)
-            VALUES ($1, $2, $3)
-        `, ...[
-            uuid, year, JSON.stringify(schoolChildren)
-        ])
+        await kyselyDb.insertInto("school_children")
+            .values({
+                id: uuid,
+                year,
+                content: JSON.stringify(schoolChildren)
+            }).execute();
     }
 
     async updateSchoolChildrenEntry(year: number, schoolChildren: SchoolChild[]) {
-        await this.db.query(`
-                UPDATE school_children SET content = $1 WHERE year = $2
-            `, ...[
-            JSON.stringify(schoolChildren), year
-        ])
+        await kyselyDb.updateTable("school_children")
+            .where("year", "=", year)
+            .set({ content: JSON.stringify(schoolChildren) })
+            .execute();
     }
 
     async findSchoolChildrenByYear(year: number): Promise<Optional<SchoolChild[]>> {
-        return Optional.fromNullable((await this.db.query(`
-            SELECT content FROM school_children WHERE year = $1
-        `, ...[ year ])).rows.map(row =>
-            row["content"] as SchoolChild[]
-        )[0])
+        return Optional.fromNullable(
+            (await kyselyDb.selectFrom("school_children")
+                .select("content")
+                .where("year", "=", year)
+                .executeTakeFirst()
+            )?.content as SchoolChild[]
+        )
     }
 }
