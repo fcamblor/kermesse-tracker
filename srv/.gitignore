@@ -36,4 +36,5 @@ lerna-debug.log*
 
 # Public ui generated content
 public/ui/
-dev/.env
+
+dev/data/
