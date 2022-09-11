@@ -1,7 +1,7 @@
 import {Pool} from "pg";
 import * as crypto from 'crypto';
 import {Kysely, PostgresDialect} from "kysely";
-import {DB} from "kysely-codegen";
+import {DB} from './generated/db-schema-definitions'
 
 export class Db {
     static newUUID() {

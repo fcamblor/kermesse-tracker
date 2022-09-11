@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "npm run codegen && nest build",
+    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "npm run codegen:dev && env-cmd -f ./dev/.env -x nest start --watch",
@@ -19,8 +19,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "codegen": "kysely-codegen --dialect=postgres --format=type",
-    "codegen:dev": "env-cmd -f ./dev/.env kysely-codegen --dialect=postgres --format=type"
+    "codegen:dev": "env-cmd -f ./dev/.env kysely-codegen --out-file src/persistance/generated/db-schema-definitions.d.ts --dialect=postgres --format=type"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
