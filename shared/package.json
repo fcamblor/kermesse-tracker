@@ -12,8 +12,11 @@
     }
   },
   "scripts": {
-    "dev": "rm -fr dist/* && mkdir -p dist/cjs dist/mjs && ./scripts/fixup-dist-modules && concurrently --kill-others \"tsc -w -p tsconfig.json\" \"tsc -w -p tsconfig-cjs.json\"",
-    "build": "rm -fr dist/* && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./scripts/fixup-dist-modules"
+    "clean": "rm -fr dist/* && mkdir -p dist/cjs dist/mjs",
+    "dev": "npm run clean && ./scripts/fixup-dist-modules && concurrently --kill-others \"tsc -p src/ -w\" \"tsc -p src/ -w --module commonjs --outdir dist/cjs\"",
+    "build": "npm run clean && concurrently \"npm run build:mjs\" \"npm run build:cjs\"",
+    "build:mjs": "tsc -p src/ && ./scripts/fixup-dist-mjs-module",
+    "build:cjs": "tsc -p src/ --module commonjs --outdir dist/cjs && ./scripts/fixup-dist-cjs-module"
   },
   "devDependencies": {
     "concurrently": "7.2.0",
