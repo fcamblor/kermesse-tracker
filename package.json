@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build": "cd shared && npm ci && npm run build && cd ../ui && npm ci && npm run build && cd ../srv && npm ci && npm run build",
-    "dev": "concurrently --kill-others \"cd shared && npm run dev\" \"cd ui && npm run dev\" \"cd srv && npm run start:debug\""
+    "dev": "concurrently --kill-others \"cd shared && npm run dev\" \"sleep 2 && cd srv && npm run start:debug\" \"sleep 6 && cd ui && npm run dev\""
   },
   "devDependencies": {
     "concurrently": "7.2.0"
