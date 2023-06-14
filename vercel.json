@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "installCommand": "npm run bootstrap",
+  "outputDirectory": "srv/public",
+  "builds": [{
+    "src": "srv/src/main.ts",
+    "use": "@vercel/node"
+  }],
+  "routes": [{
+    "src": "/(.*)",
+    "dest": "srv/src/main.ts",
+    "methods": ["GET", "POST", "PUT", "DELETE"]
+  }]
+}
