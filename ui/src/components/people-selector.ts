@@ -128,7 +128,7 @@ export class PeopleSelector extends LitElement {
 
         const terms = PeopleSelector.normalize(prefix).split(" ")
         const members = await this.members.filter(member => {
-            const searchableMember = `${member.lastName.toLowerCase()} ${member.firstName.toLowerCase()}`
+            const searchableMember = PeopleSelector.normalize(`${member.lastName} ${member.firstName}`)
             return terms.reduce((allTermsMatch: boolean, term: string) => {
                 return allTermsMatch && searchableMember.includes(term);
             }, true);
