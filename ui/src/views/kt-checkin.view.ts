@@ -77,7 +77,7 @@ abstract class AbstractKTCheckin extends LitElement {
           <div class="col-12">
             <label class="visually-hidden" for="adultsCount">Adults count</label>
             <div class="input-group">
-              <input-number id="adultsCount" min="0" .value="${this.adultsCount}" style="width: 40px" 
+              <input-number id="adultsCount" min="0" .value="${this.adultsCount}" style="width: 60px" 
                             @change="${(e:CustomEvent<number>) => this.updateAdultsCount(e.detail)}">
                 <span slot="label">Adu</span>
               </input-number>
@@ -86,7 +86,7 @@ abstract class AbstractKTCheckin extends LitElement {
           <div class="col-12">
             <label class="visually-hidden" for="childrenCount">Children count</label>
             <div class="input-group">
-              <input-number id="childrenCount" min="0" .value="${this.nonSchoolChildrenCount}" style="width: 40px"
+              <input-number id="childrenCount" min="0" .value="${this.nonSchoolChildrenCount}" style="width: 60px"
                             @change="${(e:CustomEvent<number>) => this.updateNonSchoolChildrenCount(e.detail)}">
                 <span slot="label">Enf</span>
               </input-number>
