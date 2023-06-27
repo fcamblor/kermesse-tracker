@@ -326,7 +326,7 @@ export class KTCheckinFromExistingFamilyView extends AbstractKTCheckin {
         return html`
           <ul class="my-0">
             ${repeat(this._family?.schoolChildren || [], memberKey, (schoolChild: SchoolChild) => html`
-              <li><strong>${schoolChild.lastName.toUpperCase()} ${schoolChild.firstName}</strong> (${schoolChild.className})</li>
+              <li><strong>${schoolChild.lastName.toUpperCase()} ${schoolChild.firstName}</strong> (${schoolChild.className || html`<em>Classe inconnue</em>`})</li>
             `)}
           </ul>
         `
