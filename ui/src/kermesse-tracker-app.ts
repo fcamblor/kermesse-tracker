@@ -45,7 +45,7 @@ export class KermesseTrackerApp extends LitElement {
           }
         })
 
-    this.checkinBackgroundSyncIntervalId = setInterval(async () => {
+    this.checkinBackgroundSyncIntervalId = window.setInterval(async () => {
         this.synchronizeCheckins();
     }, 60000)
   }
